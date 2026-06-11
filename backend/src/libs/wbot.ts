@@ -5,7 +5,6 @@ import makeWASocket, {
   DisconnectReason,
   fetchLatestBaileysVersion,
   AuthenticationCreds,
-  makeInMemoryStore,
   isJidBroadcast
 } from "@whiskeysockets/baileys";
 import P from "pino";

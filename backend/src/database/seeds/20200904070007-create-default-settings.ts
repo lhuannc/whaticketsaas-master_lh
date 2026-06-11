@@ -1,99 +1,103 @@
 import { QueryInterface } from "sequelize";
-import { hash } from "bcryptjs";
 
 module.exports = {
-    up: (queryInterface: QueryInterface) => {
-        return queryInterface.sequelize.transaction(async t => {
-            return Promise.all([
-                queryInterface.bulkInsert(
-                    "Settings",
-                    [
-                        {
-                            key: "chatBotType",
-                            value: "text",
-                            companyId: 1,
-                            createdAt: new Date(),
-                            updatedAt: new Date()
-                        },
-                        {
-                            key: "userRating",
-                            value: "disabled",
-                            companyId: 1,
-                            createdAt: new Date(),
-                            updatedAt: new Date()
-                        },
-                        {
-                            key: "scheduleType",
-                            value: "queue",
-                            companyId: 1,
-                            createdAt: new Date(),
-                            updatedAt: new Date()
-                        },
-                        {
-                            key: "CheckMsgIsGroup",
-                            value: "enabled",
-                            companyId: 1,
-                            createdAt: new Date(),
-                            updatedAt: new Date()
-                        },
-                        {
-                            key:"call",
-                            value: "disabled",
-                            companyId: 1,
-                            createdAt: new Date(),
-                            updatedAt: new Date()
-                        },
-                        {
-                            key: "ipixc",
-                            value: "",
-                            companyId: 1,
-                            createdAt: new Date(),
-                            updatedAt: new Date()
-                        },
-                        {
-                            key: "tokenixc",
-                            value: "",
-                            companyId: 1,
-                            createdAt: new Date(),
-                            updatedAt: new Date()
-                        },
-                        {
-                            key: "ipmkauth",
-                            value: "",
-                            companyId: 1,
-                            createdAt: new Date(),
-                            updatedAt: new Date()
-                        },
-                        {
-                            key: "clientidmkauth",
-                            value: "",
-                            companyId: 1,
-                            createdAt: new Date(),
-                            updatedAt: new Date()
-                        },
-                        {
-                            key: "clientsecretmkauth",
-                            value: "",
-                            companyId: 1,
-                            createdAt: new Date(),
-                            updatedAt: new Date()
-                        },
-                        {
-                            key: "asaas",
-                            value: "",
-                            companyId: 1,
-                            createdAt: new Date(),
-                            updatedAt: new Date()
-                        },
+  up: async (queryInterface: QueryInterface) => {
+    const [existingSettings]: any = await queryInterface.sequelize.query(
+      "SELECT key FROM \"Settings\" WHERE \"companyId\" = 1;"
+    );
+    const existingKeys = new Set(existingSettings.map((s: any) => s.key));
 
-                    ],
-                    { transaction: t }
-                )
-            ]);
-        });
-    },
+    const defaultSettings = [
+      {
+        key: "chatBotType",
+        value: "text",
+        companyId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        key: "userRating",
+        value: "disabled",
+        companyId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        key: "scheduleType",
+        value: "queue",
+        companyId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        key: "CheckMsgIsGroup",
+        value: "enabled",
+        companyId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        key: "call",
+        value: "disabled",
+        companyId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        key: "ipixc",
+        value: "",
+        companyId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        key: "tokenixc",
+        value: "",
+        companyId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        key: "ipmkauth",
+        value: "",
+        companyId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        key: "clientidmkauth",
+        value: "",
+        companyId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        key: "clientsecretmkauth",
+        value: "",
+        companyId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        key: "asaas",
+        value: "",
+        companyId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ];
 
-    down: async (queryInterface: QueryInterface) => {
-        return queryInterface.bulkDelete("Settings", {});
+    const settingsToInsert = defaultSettings.filter(
+      setting => !existingKeys.has(setting.key)
+    );
+
+    if (settingsToInsert.length > 0) {
+      await queryInterface.bulkInsert("Settings", settingsToInsert);
     }
+  },
+
+  down: async (queryInterface: QueryInterface) => {
+    return queryInterface.bulkDelete("Settings", {});
+  }
 };
+

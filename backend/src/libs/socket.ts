@@ -18,10 +18,13 @@ export const initIO = (httpServer: Server): SocketIO => {
     const { userId } = socket.handshake.query;
 
     if (userId && userId !== "undefined" && userId !== "null") {
-      const user = await User.findByPk(userId);
-      if (user) {
-        user.online = true;
-        await user.save();
+      const parsedUserId = parseInt(userId as string, 10);
+      if (!isNaN(parsedUserId)) {
+        const user = await User.findByPk(parsedUserId);
+        if (user) {
+          user.online = true;
+          await user.save();
+        }
       }
     }
 
