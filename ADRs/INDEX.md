@@ -58,6 +58,8 @@
 | [ADR-013](ADR-013-multitenant-admin.md) | Super Admin multi-tenant portal | 4 - Features | `✅ concluído` |
 | [ADR-014](ADR-014-realtime-channels.md) | Real-time: namespaces Socket.io por canal | 5 - Infra | `✅ concluído` |
 | [ADR-015](ADR-015-transfer-chat.md) | Transferência de chat para outro número/instância | 2 - Canais | `✅ concluído` |
+| [ADR-016](ADR-016-full-wpls-redesign.md) | Redesign completo frontend → padrão WPLS (handoff) | 3 - Frontend | `🔄 em andamento` |
+| [ADR-017](ADR-017-evolution-integration-review.md) | Revisão/validação ao vivo da integração Evolution API | 1 - Foundation | `🔄 em andamento` |
 
 ---
 

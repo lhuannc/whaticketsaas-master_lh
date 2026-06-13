@@ -23,9 +23,9 @@ export const listCompanies = async (req: Request, res: Response): Promise<Respon
   if (searchParam) {
     where.name = { [Op.iLike]: `%${searchParam}%` };
   }
-  if (status) {
-    where.status = status;
-  }
+  // status é boolean no schema (ativo/inativo)
+  if (status === "active") where.status = true;
+  if (status === "blocked") where.status = false;
 
   const offset = (parseInt(page) - 1) * parseInt(limit);
 
@@ -54,16 +54,19 @@ export const updateCompanyStatus = async (req: Request, res: Response): Promise<
   const { companyId } = req.params;
   const { status } = req.body;
 
-  if (!["active", "blocked", "trial"].includes(status)) {
-    throw new AppError("ERR_INVALID_STATUS");
-  }
+  // Aceita boolean direto OU strings "active"/"blocked" (status é boolean no schema)
+  let active: boolean;
+  if (typeof status === "boolean") active = status;
+  else if (status === "active") active = true;
+  else if (status === "blocked") active = false;
+  else throw new AppError("ERR_INVALID_STATUS");
 
   const company = await Company.findByPk(companyId);
   if (!company) throw new AppError("ERR_COMPANY_NOT_FOUND", 404);
 
-  await company.update({ status });
+  await company.update({ status: active });
 
-  if (status === "blocked") {
+  if (!active) {
     const whatsapps = await Whatsapp.findAll({ where: { companyId } });
     for (const wa of whatsapps) {
       if (wa.provider === "evolution" && wa.evolutionInstanceName) {
@@ -122,15 +125,19 @@ export const impersonate = async (req: Request, res: Response): Promise<Response
 };
 
 export const getMetrics = async (req: Request, res: Response): Promise<Response> => {
+  const now = new Date();
   const totalCompanies = await Company.count();
-  const activeCompanies = await Company.count({ where: { status: "active" } });
-  const trialCompanies = await Company.count({ where: { status: "trial" } });
-  const blockedCompanies = await Company.count({ where: { status: "blocked" } });
+  const activeCompanies = await Company.count({ where: { status: true } });
+  const blockedCompanies = await Company.count({ where: { status: false } });
+  // "overdue" = ativa mas com vencimento passado
+  const overdueCompanies = await Company.count({
+    where: { status: true, dueDate: { [Op.lt]: now } }
+  });
 
   return res.json({
     totalCompanies,
     activeCompanies,
-    trialCompanies,
-    blockedCompanies
+    blockedCompanies,
+    overdueCompanies
   });
 };

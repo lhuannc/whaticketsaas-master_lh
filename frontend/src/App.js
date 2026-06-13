@@ -50,18 +50,43 @@ const App = () => {
             },
             palette: {
                 type: mode,
-                primary: { main: "#007aff" },
-                textPrimary: mode === "light" ? "#007aff" : "#FFFFFF",
-                borderPrimary: mode === "light" ? "#007aff" : "#FFFFFF",
-                dark: { main: mode === "light" ? "#333333" : "#F3F3F3" },
+                primary: { main: "#2a688f", light: "#42b9eb", dark: "#1f4d6b" },
+                secondary: { main: "#42b9eb" },
+                textPrimary: mode === "light" ? "#2a688f" : "#FFFFFF",
+                borderPrimary: mode === "light" ? "#2a688f" : "#FFFFFF",
+                dark: { main: mode === "light" ? "#0f2533" : "#F3F3F3" },
                 light: { main: mode === "light" ? "#F3F3F3" : "#333333" },
                 tabHeaderBackground: mode === "light" ? "#EEE" : "#666",
-                optionsBackground: mode === "light" ? "#fafafa" : "#333",
-                fancyBackground: mode === "light" ? "#fafafa" : "#333",
-                total: mode === "light" ? "#fff" : "#222",
+                optionsBackground: mode === "light" ? "#f4f7fa" : "#172130",
+                fancyBackground: mode === "light" ? "#f4f7fa" : "#111c29",
+                total: mode === "light" ? "#fff" : "#0a1018",
                 messageIcons: mode === "light" ? "grey" : "#F3F3F3",
-                inputBackground: mode === "light" ? "#FFFFFF" : "#333",
-                barraSuperior: "#007aff"
+                inputBackground: mode === "light" ? "#FFFFFF" : "#111c29",
+                barraSuperior: mode === "light" ? "linear-gradient(135deg, #2a688f, #42b9eb)" : "#111c29"
+            },
+            typography: {
+                fontFamily: "'Manrope', 'Segoe UI', system-ui, sans-serif",
+                fontWeightMedium: 600,
+                button: { textTransform: "none", fontWeight: 600 }
+            },
+            shape: {
+                borderRadius: 12
+            },
+            overrides: {
+                MuiButton: {
+                    root: { borderRadius: 10 },
+                    containedPrimary: {
+                        background: "linear-gradient(135deg, #2a688f, #42b9eb)",
+                        boxShadow: "0 2px 8px rgba(42,104,143,.25)"
+                    }
+                },
+                MuiPaper: {
+                    rounded: { borderRadius: 14 },
+                    elevation1: { boxShadow: "0 1px 3px rgba(0,0,0,.08)" }
+                },
+                MuiChip: {
+                    root: { borderRadius: 16, fontWeight: 600 }
+                }
             },
             mode,
         },

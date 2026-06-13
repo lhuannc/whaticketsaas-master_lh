@@ -39,13 +39,18 @@ export interface EvolutionSendTextResponse {
 
 const evolutionApi = {
   async createInstance(instanceName: string, webhookUrl: string, webhookToken: string): Promise<EvolutionInstance> {
+    // Evolution API v2: requer `integration`; webhook é objeto
     const { data } = await getClient().post("/instance/create", {
       instanceName,
-      token: webhookToken,
+      token: webhookToken || undefined,
       qrcode: true,
-      webhook: webhookUrl,
-      webhook_by_events: false,
-      events: ["MESSAGES_UPSERT", "CONNECTION_UPDATE", "QRCODE_UPDATED"]
+      integration: "WHATSAPP-BAILEYS",
+      webhook: {
+        url: webhookUrl,
+        byEvents: false,
+        base64: true,
+        events: ["MESSAGES_UPSERT", "CONNECTION_UPDATE", "QRCODE_UPDATED"]
+      }
     });
     return data;
   },

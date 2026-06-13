@@ -15,6 +15,7 @@ interface EvolutionMessageUpsert {
       id: string;
       remoteJid: string;
       fromMe: boolean;
+      participant?: string;
     };
     pushName?: string;
     message?: {
@@ -92,21 +93,50 @@ const handleMessageUpsert = async (
   if (!remoteJid) return;
 
   const isGroup = remoteJid.endsWith("@g.us");
-  const number = remoteJid.replace(/@s\.whatsapp\.net|@g\.us/, "");
+  const stripJid = (jid: string) => jid.replace(/@s\.whatsapp\.net|@g\.us|@lid/g, "");
 
-  const contact = await CreateOrUpdateContactService({
-    name: data.pushName || number,
-    number,
-    isGroup,
-    companyId,
-    channel: "whatsapp"
-  });
+  let contact;        // contato emissor da mensagem (participante em grupo)
+  let groupContact;   // contato do grupo (apenas se grupo)
 
+  if (isGroup) {
+    // Grupo: cria contato do grupo + contato do participante (quem enviou)
+    const groupNumber = stripJid(remoteJid);
+    groupContact = await CreateOrUpdateContactService({
+      name: data.pushName || groupNumber,
+      number: groupNumber,
+      isGroup: true,
+      companyId,
+      channel: "whatsapp"
+    });
+
+    // participant = jid real do remetente dentro do grupo
+    const participantJid = data.key.participant || remoteJid;
+    const participantNumber = stripJid(participantJid);
+    contact = await CreateOrUpdateContactService({
+      name: data.pushName || participantNumber,
+      number: participantNumber,
+      isGroup: false,
+      companyId,
+      channel: "whatsapp"
+    });
+  } else {
+    const number = stripJid(remoteJid);
+    contact = await CreateOrUpdateContactService({
+      name: data.pushName || number,
+      number,
+      isGroup: false,
+      companyId,
+      channel: "whatsapp"
+    });
+  }
+
+  // Ticket vinculado ao grupo (groupContact) ou ao contato direto
   const ticket = await FindOrCreateTicketService(
     contact,
     whatsapp.id,
     1,
-    companyId
+    companyId,
+    groupContact
   );
 
   const body = extractMessageBody(data.message);
@@ -117,7 +147,7 @@ const handleMessageUpsert = async (
     messageData: {
       id: data.key.id,
       ticketId: ticket.id,
-      contactId: contact.id,
+      contactId: contact.id, // emissor real (participante em grupo)
       body,
       fromMe: data.key.fromMe,
       read: data.key.fromMe,
@@ -194,6 +224,8 @@ export const evolutionWebhook = async (
     if (!body?.event || !body?.instance) {
       return res.sendStatus(400);
     }
+
+    logger.info(`[EvolutionWebhook] event=${body.event} instance=${body.instance}`);
 
     const whatsapp = await Whatsapp.findOne({
       where: { evolutionInstanceName: body.instance }

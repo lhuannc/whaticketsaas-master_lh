@@ -8,7 +8,12 @@ const buildInstanceName = (whatsapp: Whatsapp): string =>
   `company${whatsapp.companyId}-wa${whatsapp.id}`;
 
 const buildWebhookUrl = (): string => {
-  const base = process.env.BACKEND_URL || "http://localhost:8080";
+  // Evolution roda em container; "localhost" lá ≠ host. Usar EVOLUTION_WEBHOOK_URL
+  // (ex: http://host.docker.internal:8090) quando Evolution está dockerizada.
+  const base =
+    process.env.EVOLUTION_WEBHOOK_URL ||
+    process.env.BACKEND_URL ||
+    "http://localhost:8080";
   return `${base}/webhook/evolution`;
 };
 

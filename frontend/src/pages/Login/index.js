@@ -28,19 +28,42 @@ import { systemVersion } from "../../../package.json";
 
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    minHeight: "100vh",
+    display: "flex",
+    alignItems: "stretch",
+    background: theme.palette.type === "light"
+      ? "linear-gradient(135deg, #2a688f 0%, #42b9eb 100%)"
+      : "#0a1018"
+  },
+  hero: {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    padding: theme.spacing(8),
+    color: "#fff",
+    [theme.breakpoints.down("sm")]: { display: "none" }
+  },
+  heroTitle: { fontSize: 40, fontWeight: 800, lineHeight: 1.1, marginBottom: 16 },
+  heroSub: { fontSize: 16, opacity: 0.9, maxWidth: 420 },
+  loginSide: {
+    width: 460,
+    maxWidth: "100%",
+    background: theme.palette.background.paper,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: theme.spacing(4),
+    [theme.breakpoints.down("sm")]: { width: "100%" }
+  },
   paper: {
-    marginTop: theme.spacing(8),
+    width: "100%",
+    maxWidth: 340,
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    justifyContent: "center",
-    textAlign: "center",
-    padding: theme.spacing(2),
-    borderRadius: theme.spacing(2),
-    //backgroundColor: `rgba(${theme.palette.background.paper}, 0.8)`,
-    backgroundColor: theme.palette.background.paper,
-    boxShadow: "0px 3px 6px rgba(0, 0, 0, 0.16)",
-
+    textAlign: "center"
   },
   avatar: {
     margin: theme.spacing(1),
@@ -114,18 +137,21 @@ const Login = () => {
       //backgroundPosition: 'center'
     //}}>
     <div className={classes.root}>
-      <Container component="main" maxWidth="md">
-        <CssBaseline />
-        <div className={classes.containerWrapper}>
-          <Container component="div" maxWidth="xs" className={classes.mobileContainer}>
-            <div className={classes.paper}>
-            <div>
-            <img src={chatImage} style={{width:'100%'}} alt={process.env.REACT_APP_TITLE} />
-            </div>
-              <Typography component="h1" variant="h5">
-                {i18n.t("login.title")}
-              </Typography>
-              <form className={classes.form} noValidate onSubmit={handleSubmit}>
+      <CssBaseline />
+      <div className={classes.hero}>
+        <div className={classes.heroTitle}>WPLS Omnichannel</div>
+        <div className={classes.heroSub}>
+          Atendimento unificado: WhatsApp, Instagram e LinkedIn em uma só caixa de entrada,
+          com AI Copilot, funil CRM e automação de fluxos.
+        </div>
+      </div>
+      <div className={classes.loginSide}>
+        <div className={classes.paper}>
+          <img src={chatImage} style={{ width: "70%", marginBottom: 16 }} alt={process.env.REACT_APP_TITLE} />
+          <Typography component="h1" variant="h5" style={{ fontWeight: 700 }}>
+            {i18n.t("login.title")}
+          </Typography>
+          <form className={classes.form} noValidate onSubmit={handleSubmit}>
                 <TextField
                   variant="outlined"
                   margin="normal"
@@ -185,12 +211,10 @@ const Login = () => {
                   </Grid>
                 </Grid>
               </form>
-            </div>
-          </Container>       
         </div>
-      </Container>
+      </div>
     </div>
-  ); 
+  );
 };
 
 export default Login; 

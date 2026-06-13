@@ -34,12 +34,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const statusPill = (status) => {
-  const map = {
-    active: { cls: "ok", label: "Ativo" },
-    trial: { cls: "warn", label: "Trial" },
-    blocked: { cls: "bad", label: "Bloqueado" }
-  };
-  const cfg = map[status] || { cls: "warn", label: status };
+  // status é boolean: true=ativo, false=bloqueado
+  const cfg = status
+    ? { cls: "ok", label: "Ativo" }
+    : { cls: "bad", label: "Bloqueado" };
   return <span className={`wpls-pill ${cfg.cls}`}>{cfg.label}</span>;
 };
 
@@ -101,7 +99,7 @@ const SuperAdmin = () => {
           {[
             { label: "Total", val: metrics.totalCompanies },
             { label: "Ativos", val: metrics.activeCompanies },
-            { label: "Trial", val: metrics.trialCompanies },
+            { label: "Vencidos", val: metrics.overdueCompanies },
             { label: "Bloqueados", val: metrics.blockedCompanies }
           ].map((m) => (
             <Grid item xs={6} sm={3} key={m.label}>
@@ -141,7 +139,7 @@ const SuperAdmin = () => {
                 <TableCell>{statusPill(c.status)}</TableCell>
                 <TableCell>{c.dueDate ? new Date(c.dueDate).toLocaleDateString("pt-BR") : "-"}</TableCell>
                 <TableCell align="right">
-                  {c.status !== "blocked" ? (
+                  {c.status ? (
                     <Button size="small" style={{ color: "#ef4444" }} onClick={() => setStatus(c.id, "blocked")}>Bloquear</Button>
                   ) : (
                     <Button size="small" style={{ color: "#16a34a" }} onClick={() => setStatus(c.id, "active")}>Ativar</Button>
