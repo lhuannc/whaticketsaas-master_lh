@@ -34,6 +34,14 @@ import Subscription from "../pages/Subscription/";
 import ToDoList from "../pages/ToDoList/";
 import Kanban from "../pages/Kanban";
 import TagsKanban from "../pages/TagsKanban/";
+import Moderation from "../pages/Moderation/";
+import Funnel from "../pages/Funnel/";
+import SuperAdmin from "../pages/SuperAdmin/";
+import Channels from "../pages/Channels/";
+import IAConfig from "../pages/IAConfig/";
+import Flows from "../pages/Flows/";
+import Management from "../pages/Management/";
+import Profile from "../pages/Profile/";
 
 
 const Routes = () => {
@@ -123,6 +131,14 @@ const Routes = () => {
                   isPrivate
                 />
                 <Route exact path="/chats/:id?" component={Chat} isPrivate />
+                <Route exact path="/moderation" component={Moderation} isPrivate />
+                <Route exact path="/funnel" component={Funnel} isPrivate />
+                <Route exact path="/channels" component={Channels} isPrivate />
+                <Route exact path="/ia-config" component={IAConfig} isPrivate />
+                <Route exact path="/flows" component={Flows} isPrivate />
+                <Route exact path="/management" component={Management} isPrivate />
+                <Route exact path="/profile" component={Profile} isPrivate />
+                <Route exact path="/super-admin" component={SuperAdmin} isPrivate />
                 {showCampaigns && (
                   <>
                     <Route

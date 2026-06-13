@@ -16,6 +16,8 @@ interface Request {
   companyId: number;
   extraInfo?: ExtraInfo[];
   channel?: string;
+  channelUsername?: string;
+  channelProfileUrl?: string;
 }
 
 const CreateOrUpdateContactService = async ({
@@ -26,7 +28,9 @@ const CreateOrUpdateContactService = async ({
   email = "",
   companyId,
   extraInfo = [],
-  channel = "whatsapp"
+  channel = "whatsapp",
+  channelUsername,
+  channelProfileUrl
 }: Request): Promise<Contact> => {
   const number = isGroup ? rawNumber : rawNumber.replace(/[^0-9]/g, "");
 
@@ -42,7 +46,7 @@ const CreateOrUpdateContactService = async ({
   });
 
   if (contact) {
-    contact.update({ profilePicUrl });
+    contact.update({ profilePicUrl, channelUsername, channelProfileUrl });
 
     io.emit(`company-${companyId}-contact`, {
       action: "update",
@@ -57,7 +61,9 @@ const CreateOrUpdateContactService = async ({
       isGroup,
       extraInfo,
       companyId,
-      channel
+      channel,
+      channelUsername,
+      channelProfileUrl
     });
 
     io.emit(`company-${companyId}-contact`, {

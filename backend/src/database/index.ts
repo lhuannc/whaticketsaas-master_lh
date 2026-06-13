@@ -32,6 +32,10 @@ import ChatUser from "../models/ChatUser";
 import ChatMessage from "../models/ChatMessage";
 import Invoices from "../models/Invoices";
 import Subscriptions from "../models/Subscriptions";
+import InstagramAccount from "../models/InstagramAccount";
+import LinkedinAccount from "../models/LinkedinAccount";
+import Comment from "../models/Comment";
+import Flow from "../models/Flow";
 
 // eslint-disable-next-line
 const dbConfig = require("../config/database");
@@ -72,7 +76,11 @@ const models = [
   ChatUser,
   ChatMessage,
   Invoices,
-  Subscriptions
+  Subscriptions,
+  InstagramAccount,
+  LinkedinAccount,
+  Comment,
+  Flow
 ];
 
 sequelize.addModels(models);

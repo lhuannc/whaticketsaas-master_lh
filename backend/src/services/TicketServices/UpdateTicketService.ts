@@ -1,4 +1,4 @@
-import moment from "moment";
+﻿import moment from "moment";
 import * as Sentry from "@sentry/node";
 import CheckContactOpenTickets from "../../helpers/CheckContactOpenTickets";
 import SetTicketMessagesAsRead from "../../helpers/SetTicketMessagesAsRead";
@@ -9,9 +9,11 @@ import Queue from "../../models/Queue";
 import ShowTicketService from "./ShowTicketService";
 import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService";
 import SendWhatsAppMessage from "../WbotServices/SendWhatsAppMessage";
+import SendWhatsAppMessageEvolution from "../WbotServices/SendWhatsAppMessageEvolution";
 import FindOrCreateATicketTrakingService from "./FindOrCreateATicketTrakingService";
 import GetTicketWbot from "../../helpers/GetTicketWbot";
 import { verifyMessage } from "../WbotServices/wbotMessageListener";
+import Whatsapp from "../../models/Whatsapp";
 import { isNil } from "lodash";
 import sendFaceMessage from "../FacebookServices/sendFacebookMessage";
 
@@ -144,27 +146,26 @@ const UpdateTicketService = async ({
     }
 
     if (oldQueueId !== queueId && !isNil(oldQueueId) && !isNil(queueId)) {
-      const queue = await Queue.findByPk(queueId);
-      if (ticket.channel === "whatsapp") {
-        const wbot = await GetTicketWbot(ticket);
+      const transferBody = "‎Você foi transferido, em breve iremos iniciar seu atendimento.";
 
-        const queueChangedMessage = await wbot.sendMessage(
-          `${ticket.contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"
-          }`,
-          {
-            text: "\u200eVocê foi transferido, em breve iremos iniciar seu atendimento."
-          }
-        );
-        await verifyMessage(queueChangedMessage, ticket, ticket.contact);
+      if (ticket.channel === "whatsapp") {
+        const whatsappInstance = await Whatsapp.findByPk(ticket.whatsappId);
+        if (whatsappInstance?.provider === "evolution") {
+          await SendWhatsAppMessageEvolution({ body: transferBody, ticket });
+        } else {
+          const wbot = await GetTicketWbot(ticket);
+          const queueChangedMessage = await wbot.sendMessage(
+            `${ticket.contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"}`,
+            { text: transferBody }
+          );
+          await verifyMessage(queueChangedMessage, ticket, ticket.contact);
+        }
       }
 
       if (["facebook", "instagram"].includes(ticket.channel)) {
-        console.log(`Checking if ${ticket.contact.number} is a valid ${ticket.channel} contact`)
-        await sendFaceMessage({ body: "\u200eVocê foi transferido, em breve iremos iniciar seu atendimento.", ticket });
+        await sendFaceMessage({ body: transferBody, ticket });
       }
-    }
-
-    await ticket.update({
+    }    await ticket.update({
       status,
       queueId,
       userId,

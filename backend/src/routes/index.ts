@@ -28,6 +28,13 @@ import invoiceRoutes from "./invoicesRoutes";
 import subscriptionRoutes from "./subScriptionRoutes";
 import webHookMetaRoutes from "./WebHookMetaRoutes";
 import ticketTagRoutes from "./ticketTagRoutes";
+import evolutionWebhookRoutes from "./evolutionWebhookRoutes";
+import commentsRoutes from "./commentsRoutes";
+import instagramRoutes from "./instagramRoutes";
+import linkedinRoutes from "./linkedinRoutes";
+import superAdminRoutes from "./superAdminRoutes";
+import aiRoutes from "./aiRoutes";
+import flowRoutes from "./flowRoutes";
 
 const routes = Router();
 
@@ -59,6 +66,13 @@ routes.use(chatRoutes);
 routes.use(subscriptionRoutes);
 routes.use(invoiceRoutes);
 routes.use("/webhook/fb", webHookMetaRoutes);
+routes.use("/webhook/evolution", evolutionWebhookRoutes);
+routes.use(commentsRoutes);
+routes.use("/api", instagramRoutes);
+routes.use("/api", linkedinRoutes);
+routes.use(superAdminRoutes);
+routes.use(aiRoutes);
+routes.use(flowRoutes);
 routes.use(ticketTagRoutes);
 
 

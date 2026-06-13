@@ -1,0 +1,54 @@
+/* WPLS Design Tokens — aplicado nas telas novas (ADR-005 re-escopo: sem rewrite, só tokens) */
+:root {
+  --wpls-brand-deep: #2a688f;
+  --wpls-brand-bright: #42b9eb;
+  --wpls-brand-grad: linear-gradient(135deg, #2a688f, #42b9eb);
+  --wpls-wa-green: #25D366;
+  --wpls-ig-grad: linear-gradient(45deg, #feda75, #fa7e1e, #d62976, #962fbf);
+  --wpls-li-blue: #0a66c2;
+  --wpls-ok: #16a34a;
+  --wpls-warn: #f59e0b;
+  --wpls-bad: #ef4444;
+  --wpls-r-sm: 8px;
+  --wpls-r-md: 12px;
+  --wpls-r-lg: 16px;
+  --wpls-shadow-sm: 0 1px 2px rgba(0,0,0,.08);
+  --wpls-shadow-md: 0 4px 12px rgba(0,0,0,.10);
+}
+
+/* Canal badges */
+.wpls-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+}
+.wpls-badge.wa { background: var(--wpls-wa-green); }
+.wpls-badge.ig { background: var(--wpls-ig-grad); }
+.wpls-badge.li { background: var(--wpls-li-blue); }
+
+/* Status pills */
+.wpls-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.wpls-pill.ok { background: rgba(22,163,74,.15); color: var(--wpls-ok); }
+.wpls-pill.warn { background: rgba(245,158,11,.15); color: var(--wpls-warn); }
+.wpls-pill.bad { background: rgba(239,68,68,.15); color: var(--wpls-bad); }
+
+/* Funnel stage dots */
+.wpls-stage-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.wpls-stage-dot.novo { background: #94a3b8; }
+.wpls-stage-dot.qualificado { background: #42b9eb; }
+.wpls-stage-dot.proposta { background: #f59e0b; }
+.wpls-stage-dot.negociacao { background: #a855f7; }
+.wpls-stage-dot.ganho { background: #16a34a; }

@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import Whatsapp from "../models/Whatsapp";
+import InstagramAccount from "../models/InstagramAccount";
 import { handleMessage } from "../services/FacebookServices/facebookMessageListener";
+import { handleInstagramCommentWebhook } from "../services/InstagramServices/InstagramCommentListener";
 // import { handleMessage } from "../services/FacebookServices/facebookMessageListener";
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -36,22 +38,29 @@ export const webHook = async (
       channel = "instagram";
     }
 
-    body.entry?.forEach(async (entry: any) => {
-      const getTokenPage = await Whatsapp.findOne({
-        where: {
-          facebookPageUserId: entry.id,
-          channel
-        }
-      });
-
-      if (getTokenPage) {
-        entry.messaging?.forEach((data: any) => {
- 
-          console.log(data)
-          handleMessage(getTokenPage, data, channel, getTokenPage.companyId);
+    for (const entry of body.entry || []) {
+      // DMs (messaging events)
+      if (entry.messaging?.length > 0) {
+        const getTokenPage = await Whatsapp.findOne({
+          where: { facebookPageUserId: entry.id, channel }
         });
+        if (getTokenPage) {
+          for (const data of entry.messaging) {
+            handleMessage(getTokenPage, data, channel, getTokenPage.companyId);
+          }
+        }
       }
-    });
+
+      // Instagram comment events (feed subscription)
+      if (channel === "instagram" && entry.changes?.length > 0) {
+        const igAccount = await InstagramAccount.findOne({
+          where: { igUserId: entry.id }
+        });
+        if (igAccount) {
+          handleInstagramCommentWebhook(entry, igAccount);
+        }
+      }
+    }
 
     return res.status(200).json({
       message: "EVENT_RECEIVED"

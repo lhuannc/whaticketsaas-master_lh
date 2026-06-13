@@ -52,7 +52,16 @@ const QrcodeModal = ({ open, onClose, whatsAppId }) => {
             {i18n.t("qrCode.message")}
           </Typography>
           {qrCode ? (
-            <QRCode value={qrCode} size={256} />
+            // Evolution API entrega QR como imagem base64; Baileys entrega string raw
+            /^data:image|^[A-Za-z0-9+/=]{200,}$/.test(qrCode) ? (
+              <img
+                src={qrCode.startsWith("data:image") ? qrCode : `data:image/png;base64,${qrCode}`}
+                alt="QR Code"
+                style={{ width: 256, height: 256 }}
+              />
+            ) : (
+              <QRCode value={qrCode} size={256} />
+            )
           ) : (
             <span>Waiting for QR Code</span>
           )}

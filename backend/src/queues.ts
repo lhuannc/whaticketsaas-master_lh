@@ -48,6 +48,7 @@ interface DispatchCampaignData {
 }
 
 export const userMonitor = new Queue("UserMonitor", connection);
+export const linkedinPollQueue = new Queue("LinkedinPoll", connection);
 
 
 export const messageQueue = new Queue("MessageQueue", connection, {
@@ -64,6 +65,19 @@ export const sendScheduledMessages = new Queue(
 );
 
 export const campaignQueue = new Queue("CampaignQueue", connection);
+
+async function handleLinkedinPoll(job: any) {
+  const { default: LinkedinAccount } = await import("./models/LinkedinAccount");
+  const { pollLinkedinComments } = await import("./services/LinkedinServices/LinkedinCommentService");
+  try {
+    const accounts = await LinkedinAccount.findAll({ where: { status: "connected" } });
+    for (const account of accounts) {
+      await pollLinkedinComments(account);
+    }
+  } catch (e: any) {
+    logger.error("LinkedinPoll error", e.message);
+  }
+}
 
 async function handleSendMessage(job) {
   try {
@@ -697,6 +711,8 @@ export async function startQueueProcess() {
 
   userMonitor.process("VerifyLoginStatus", handleLoginStatus);
 
+  linkedinPollQueue.process("PollComments", handleLinkedinPoll);
+
 
 
 
@@ -723,6 +739,15 @@ export async function startQueueProcess() {
     {},
     {
       repeat: { cron: "* * * * *" },
+      removeOnComplete: true
+    }
+  );
+
+  linkedinPollQueue.add(
+    "PollComments",
+    {},
+    {
+      repeat: { cron: "*/5 * * * *" },
       removeOnComplete: true
     }
   );

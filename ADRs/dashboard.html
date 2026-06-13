@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WPLS Migration — ADR Dashboard</title>
+<style>
+  :root {
+    --brand-deep: #2a688f;
+    --brand-bright: #42b9eb;
+    --brand-grad: linear-gradient(135deg, #2a688f, #42b9eb);
+    --bg: #0a1018;
+    --surface: #111c29;
+    --surface2: #172130;
+    --border: #1e2f42;
+    --text: #e2eaf3;
+    --text-muted: #7a9bb5;
+    --green: #22c55e;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --blue: #42b9eb;
+    --r: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; min-height: 100vh; }
+
+  /* TOP BAR */
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 100; }
+  .topbar h1 { font-size: 16px; font-weight: 700; background: var(--brand-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .topbar .subtitle { color: var(--text-muted); font-size: 12px; }
+  .topbar .spacer { flex: 1; }
+  .global-progress { display: flex; align-items: center; gap: 10px; }
+  .global-progress .label { color: var(--text-muted); font-size: 12px; }
+  .global-progress .pct { font-weight: 700; font-size: 16px; color: var(--brand-bright); }
+  .progress-bar { width: 160px; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--brand-grad); border-radius: 4px; transition: width 0.4s; }
+
+  /* FILTERS */
+  .filters { padding: 16px 24px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .filter-btn { padding: 5px 14px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; font-size: 12px; transition: all 0.15s; }
+  .filter-btn:hover { border-color: var(--brand-bright); color: var(--brand-bright); }
+  .filter-btn.active { background: var(--brand-deep); border-color: var(--brand-bright); color: #fff; }
+
+  /* MAIN GRID */
+  .main { padding: 0 24px 40px; display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 16px; }
+
+  /* ADR CARD */
+  .adr-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; transition: border-color 0.2s; }
+  .adr-card:hover { border-color: var(--brand-deep); }
+  .adr-card.done { border-left: 3px solid var(--green); }
+  .adr-card.inprogress { border-left: 3px solid var(--yellow); }
+  .adr-card.pending { border-left: 3px solid var(--border); }
+
+  .card-header { padding: 14px 16px; display: flex; align-items: flex-start; gap: 10px; cursor: pointer; user-select: none; }
+  .card-header:hover { background: var(--surface2); }
+  .adr-id { font-size: 11px; font-weight: 700; color: var(--brand-bright); white-space: nowrap; }
+  .card-info { flex: 1; min-width: 0; }
+  .card-title { font-weight: 600; font-size: 13px; line-height: 1.3; }
+  .card-meta { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .badge.done { background: #052e16; color: var(--green); }
+  .badge.inprogress { background: #2d1e06; color: var(--yellow); }
+  .badge.pending { background: #1a2535; color: var(--text-muted); }
+  .badge.fase { background: var(--surface2); color: var(--text-muted); }
+  .chevron { font-size: 12px; color: var(--text-muted); transition: transform 0.2s; margin-top: 2px; }
+  .chevron.open { transform: rotate(180deg); }
+
+  .card-progress { padding: 0 16px 10px; }
+  .mini-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .mini-fill { height: 100%; background: var(--brand-grad); border-radius: 2px; transition: width 0.4s; }
+  .mini-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+  /* TASK LIST */
+  .task-list { border-top: 1px solid var(--border); display: none; }
+  .task-list.open { display: block; }
+  .task-item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.1s; }
+  .task-item:last-child { border-bottom: none; }
+  .task-item:hover { background: var(--surface2); }
+  .task-check { width: 16px; height: 16px; border-radius: 4px; border: 2px solid var(--border); flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+  .task-item.checked .task-check { background: var(--green); border-color: var(--green); }
+  .task-item.checked .task-check::after { content: '✓'; color: #fff; font-size: 10px; font-weight: 700; }
+  .task-item.checked .task-text { color: var(--text-muted); text-decoration: line-through; }
+  .task-text { font-size: 12px; line-height: 1.4; flex: 1; }
+  .task-id { font-size: 10px; color: var(--text-muted); flex-shrink: 0; }
+
+  /* EXTERNAL ALERTS */
+  .alerts { padding: 0 24px 16px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .alert { background: #2d1e06; border: 1px solid #78350f; border-radius: var(--r); padding: 10px 14px; font-size: 12px; display: flex; align-items: center; gap: 8px; color: #fbbf24; }
+  .alert .icon { font-size: 16px; }
+
+  /* LEGEND */
+  .legend { padding: 8px 24px 16px; display: flex; gap: 16px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot.green { background: var(--green); }
+  .dot.yellow { background: var(--yellow); }
+  .dot.gray { background: var(--border); }
+
+  @media (max-width: 600px) {
+    .topbar { flex-wrap: wrap; }
+    .main { grid-template-columns: 1fr; padding: 0 12px 40px; }
+    .filters { padding: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <h1>WPLS Migration Dashboard</h1>
+    <div class="subtitle">WhaTicket SaaS → Omnichannel Plus · Início: 2026-06-11</div>
+  </div>
+  <div class="spacer"></div>
+  <div class="global-progress">
+    <span class="label">Progresso geral</span>
+    <div class="progress-bar"><div class="progress-fill" id="globalFill"></div></div>
+    <span class="pct" id="globalPct">0%</span>
+  </div>
+</div>
+
+<div class="alerts">
+  <div class="alert"><span class="icon">⚠️</span> App Meta (Facebook Developer) — pendente de registro + aprovação</div>
+  <div class="alert"><span class="icon">⚠️</span> App LinkedIn Marketing Developer Platform — pendente de aprovação</div>
+  <div class="alert"><span class="icon">⚠️</span> Evolution API Docker — configurar docker-compose.evolution.yml</div>
+</div>
+
+<div class="filters">
+  <button class="filter-btn active" data-filter="all">Todos</button>
+  <button class="filter-btn" data-filter="fase1">Fase 1 — Foundation</button>
+  <button class="filter-btn" data-filter="fase2">Fase 2 — Canais</button>
+  <button class="filter-btn" data-filter="fase3">Fase 3 — Frontend</button>
+  <button class="filter-btn" data-filter="fase4">Fase 4 — Features</button>
+  <button class="filter-btn" data-filter="fase5">Fase 5 — Infra</button>
+  <button class="filter-btn" data-filter="done">Concluídos</button>
+  <button class="filter-btn" data-filter="inprogress">Em andamento</button>
+  <button class="filter-btn" data-filter="pending">Pendentes</button>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="dot green"></div> Concluído</div>
+  <div class="legend-item"><div class="dot yellow"></div> Em andamento</div>
+  <div class="legend-item"><div class="dot gray"></div> Pendente</div>
+</div>
+
+<div class="main" id="cardGrid"></div>
+
+<script>
+const ADRS = [
+  {
+    id: "ADR-001", fase: "fase1", title: "Migrar WhatsApp: Baileys → Evolution API",
+    status: "inprogress",
+    tasks: [
+      { id: "T-001.1", text: "Subir Evolution API (Docker) — docker-compose.evolution.yml + EVOLUTION-SETUP.md", backend: true, done: true },
+      { id: "T-001.2", text: "Criar libs/evolutionApi.ts (cliente HTTP)", backend: true, done: true },
+      { id: "T-001.3", text: "Migration: campo evolutionInstanceName em Whatsapp", backend: true, done: true },
+      { id: "T-001.4", text: "StartWhatsAppSessionEvolution + StartAllWhatsAppsSessions branching", backend: true, done: true },
+      { id: "T-001.5", text: "Webhook POST /webhook/evolution + EvolutionWebhookController", backend: true, done: true },
+      { id: "T-001.6", text: "QR Code frontend: QrcodeModal renderiza base64 Evolution (img) ou raw Baileys (QRCode)", frontend: true, done: true },
+      { id: "T-001.7", text: "WhatsAppSessionController branching por provider", backend: true, done: true },
+      { id: "T-001.8", text: "Testes: envio texto, mídia, reconexão", test: true },
+    ]
+  },
+  {
+    id: "ADR-002", fase: "fase1", title: "Schema DB: suporte multi-canal",
+    status: "done",
+    tasks: [
+      { id: "T-002.1", text: "Migration: funnelStage + dealValue em Tickets", backend: true, done: true },
+      { id: "T-002.2", text: "Migration: externalId + parentCommentId em Messages", backend: true, done: true },
+      { id: "T-002.3", text: "Migration: channelUsername + channelProfileUrl em Contacts", backend: true, done: true },
+      { id: "T-002.4", text: "Model + Migration: InstagramAccount", backend: true, done: true },
+      { id: "T-002.5", text: "Model + Migration: LinkedinAccount", backend: true, done: true },
+      { id: "T-002.6", text: "Model + Migration: Comment (IG + LI)", backend: true, done: true },
+      { id: "T-002.7", text: "Atualizar models existentes (Ticket, Contact, Message, Whatsapp)", backend: true, done: true },
+      { id: "T-002.8", text: "Seeders multi-canal para ambiente dev (AI settings + comments samples)", backend: true, done: true },
+    ]
+  },
+  {
+    id: "ADR-003", fase: "fase2", title: "Instagram Graph API (DM + Comentários)",
+    status: "inprogress",
+    tasks: [
+      { id: "T-003.1", text: "Registrar App Meta + permissões + App Review", external: true },
+      { id: "T-003.2", text: "OAuth2 flow: GET /instagram/auth + callback", backend: true, done: true },
+      { id: "T-003.3", text: "Webhook Meta para DMs Instagram (já existia, estendido)", backend: true, done: true },
+      { id: "T-003.4", text: "Webhook Meta para Comentários → model Comment", backend: true, done: true },
+      { id: "T-003.4b", text: "Validar FindOrCreateTicketServiceMeta cobre IG + regras reopen", backend: true, done: true },
+      { id: "T-003.5", text: "InstagramCommentService: replyToComment, hideComment", backend: true, done: true },
+      { id: "T-003.6", text: "InstagramOAuthService: exchangeCode, refreshToken", backend: true, done: true },
+      { id: "T-003.7", text: "UI Canais (page Channels): conectar Instagram via OAuth popup", frontend: true, done: true },
+      { id: "T-003.8", text: "UI Moderação (page Moderation): stream comentários IG inline", frontend: true, done: true },
+      { id: "T-003.9", text: "Testes unit mock-axios: replyToIgComment + hideIgComment (2 passando)", test: true, done: true },
+    ]
+  },
+  {
+    id: "ADR-004", fase: "fase2", title: "LinkedIn API (resposta a comentários)",
+    status: "inprogress",
+    tasks: [
+      { id: "T-004.1", text: "Registrar App LinkedIn + Marketing Developer Platform", external: true },
+      { id: "T-004.2", text: "OAuth2 flow: GET /linkedin/auth + callback", backend: true, done: true },
+      { id: "T-004.3", text: "LinkedinService: getOrganizationPosts, getPostComments", backend: true, done: true },
+      { id: "T-004.3b", text: "FindOrCreateTicketServiceLinkedin (regras reopen/clear preservadas)", backend: true, done: true },
+      { id: "T-004.4", text: "Bull Job: polling comentários LI a cada 5min", backend: true, done: true },
+      { id: "T-004.5", text: "LinkedinService: replyToComment", backend: true, done: true },
+      { id: "T-004.6", text: "LinkedinService: likeComment", backend: true, done: true },
+      { id: "T-004.7", text: "UI Canais (page Channels): conectar LinkedIn via OAuth popup", frontend: true, done: true },
+      { id: "T-004.8", text: "UI Moderação: filtro LinkedIn", frontend: true, done: true },
+      { id: "T-004.9", text: "Testes unit mock-axios: replyToLiComment + likeLiComment (2 passando)", test: true, done: true },
+    ]
+  },
+  {
+    id: "ADR-015", fase: "fase2", title: "Transferência de chat para outro número",
+    status: "inprogress",
+    tasks: [
+      { id: "T-015.1", text: "POST /tickets/:id/transfer-instance", backend: true, done: true },
+      { id: "T-015.2", text: "POST /tickets/:id/forward", backend: true, done: true },
+      { id: "T-015.3", text: "TransferInstanceService (troca instância, zera operador)", backend: true, done: true },
+      { id: "T-015.4", text: "ForwardTicketService (encaminha histórico para número externo)", backend: true, done: true },
+      { id: "T-015.5", text: "Fix UpdateTicketService: mensagem troca de fila usa Evolution quando provider=evolution", backend: true, done: true },
+      { id: "T-015.6", text: "Frontend: TransferModal montado em TicketActionButtonsCustom (botão SwapHoriz)", frontend: true, done: true },
+      { id: "T-015.7", text: "Frontend: seletor de instâncias com status (no TransferModal)", frontend: true, done: true },
+      { id: "T-015.8", text: "Frontend: feedback toast pós-transferência", frontend: true, done: true },
+    ]
+  },
+  {
+    id: "ADR-005", fase: "fase3", title: "Frontend: React 16 → 18 + Vite + Design System",
+    status: "pending",
+    tasks: [
+      { id: "T-005.1", text: "Setup Vite + React 18 + TS — DESCOPED: decisão = páginas novas no stack atual (CRA/React16/JS)", frontend: true, done: true },
+      { id: "T-005.2", text: "styles/wpls-theme.css: tokens WPLS (brand, canal badges, pills, stage dots)", frontend: true, done: true },
+      { id: "T-005.3", text: "Migrar contextos (Auth, Whatsapp, Tickets) para TS", frontend: true },
+      { id: "T-005.4", text: "Serviços API tipados (Axios + interceptors)", frontend: true },
+      { id: "T-005.5", text: "React Router 5 → 6 (Switch → Routes)", frontend: true },
+      { id: "T-005.6", text: "Componentes base: WplsChannelBadge + StatusPill/stage-dots via CSS", frontend: true, done: true },
+      { id: "T-005.7", text: "i18n (i18next) no novo setup Vite", frontend: true },
+      { id: "T-005.8", text: "Build + Nginx serve + Dockerfile frontend", frontend: true },
+    ]
+  },
+  {
+    id: "ADR-006", fase: "fase3", title: "App Operador Mobile (bottom-tab)",
+    status: "pending",
+    tasks: [
+      { id: "T-006.1", text: "MobileBottomNav (4 abas, <600px) montado no layout", frontend: true, done: true },
+      { id: "T-006.2", text: "Aba Conversas → /tickets (TicketResponsiveContainer já responsivo)", frontend: true, done: true },
+      { id: "T-006.3", text: "Tela Chat: Ticket responsivo existente (bolhas + composer + áudio)", frontend: true, done: true },
+      { id: "T-006.4", text: "Copilot: CopilotDrawer no header do ticket (suggest/correct/summarize)", frontend: true, done: true },
+      { id: "T-006.5", text: "Aba Comentários → /moderation (responsivo)", frontend: true, done: true },
+      { id: "T-006.6", text: "Aba Funil → /funnel (board scroll horiz + touch drag)", frontend: true, done: true },
+      { id: "T-006.7", text: "Aba Perfil: page Profile (stats, presença toggle, logout)", frontend: true, done: true },
+      { id: "T-006.8", text: "useMediaQuery breakpoints.down(xs) oculta bottom nav no desktop", frontend: true, done: true },
+    ]
+  },
+  {
+    id: "ADR-007", fase: "fase3", title: "Desktop: layout 3-painéis (inbox/chat/contexto)",
+    status: "pending",
+    tasks: [
+      { id: "T-007.1", text: "Layout 3-painéis: existente (TicketsManager + Ticket + ContactDrawer)", frontend: true, done: true },
+      { id: "T-007.2", text: "Painel esquerdo: TicketsManagerTabs existente (tabs + filtros)", frontend: true, done: true },
+      { id: "T-007.3", text: "Painel central: Ticket/MessagesList existente (bolhas + composer)", frontend: true, done: true },
+      { id: "T-007.4", text: "Copilot: CopilotDrawer no header do ticket", frontend: true, done: true },
+      { id: "T-007.5", text: "Painel direito: ContactDrawer + CrmPanel (estágio funil + valor editável)", frontend: true, done: true },
+      { id: "T-007.6", text: "Transferência: TransferModal no header do ticket", frontend: true, done: true },
+      { id: "T-007.7", text: "Socket.io: useSocket + reconexão toast (Moderation/Funnel); Ticket usa socket existente", frontend: true, done: true },
+    ]
+  },
+  {
+    id: "ADR-008", fase: "fase3", title: "Tela Moderação comentários (IG + LI)",
+    status: "pending",
+    tasks: [
+      { id: "T-008.1", text: "Rota /moderation + página (lista responsiva)", frontend: true, done: true },
+      { id: "T-008.2", text: "CommentRow: avatar, texto, canal badge, status, ações", frontend: true, done: true },
+      { id: "T-008.3", text: "Composer reply inline", frontend: true, done: true },
+      { id: "T-008.4", text: "Filtros: canal + tabs status (pendente/respondido/spam)", frontend: true, done: true },
+      { id: "T-008.5", text: "Contexto do post: endpoint /comments/posts (agrega total/pendentes) + barra filtro por post", frontend: true, done: true },
+      { id: "T-008.6", text: "Atualização tempo real via Socket.io company-{id}-comment", frontend: true, done: true },
+      { id: "T-008.7", text: "Ação 'Converter para DM' → endpoint convert-to-dm + navega p/ ticket", frontend: true, done: true },
+    ]
+  },
+  {
+    id: "ADR-009", fase: "fase3", title: "Management Hub: canais, equipe, IA, financeiro",
+    status: "pending",
+    tasks: [
+      { id: "T-009.1", text: "Hub Gestão (page Management): cards p/ Canais/IA/Fluxos/Equipe/Filas/Financeiro/Config/SuperAdmin", frontend: true, done: true },
+      { id: "T-009.2", text: "Canais WhatsApp: page Connections existente + QR Evolution wired (link no hub)", frontend: true, done: true },
+      { id: "T-009.3", text: "Canais: conta Instagram — OAuth popup, status token (page Channels)", frontend: true, done: true },
+      { id: "T-009.4", text: "Canais: organização LinkedIn — OAuth popup, último poll (page Channels)", frontend: true, done: true },
+      { id: "T-009.5", text: "Equipe: page Users existente (CRUD, roles) — link no hub", frontend: true, done: true },
+      { id: "T-009.6", text: "IA: página IAConfig — tom, persona, base conhecimento RAG (settings aiTone/aiPersona/aiKnowledgeBase)", frontend: true, done: true },
+      { id: "T-009.7", text: "Financeiro: page Financeiro existente (plano, PIX, faturas) — link no hub", frontend: true, done: true },
+      { id: "T-009.8", text: "Configurações: page SettingsCustom existente — link no hub", frontend: true, done: true },
+    ]
+  },
+  {
+    id: "ADR-010", fase: "fase4", title: "AI Copilot: sugestões, tom, resumo",
+    status: "inprogress",
+    tasks: [
+      { id: "T-010.1", text: "AiService abstrato (OpenAI + Anthropic)", backend: true, done: true },
+      { id: "T-010.2", text: "CopilotService: suggest / correct / summarize", backend: true, done: true },
+      { id: "T-010.3", text: "POST /ai/suggest com rate limit por tenant", backend: true, done: true },
+      { id: "T-010.4", text: "RAG básico: base de conhecimento por keyword no contexto (aiKnowledgeBase)", backend: true, done: true },
+      { id: "T-010.5", text: "Frontend: CopilotDrawer montado em TicketActionButtonsCustom (botão ✨)", frontend: true, done: true },
+      { id: "T-010.6", text: "Frontend: card de sugestão (Usar / Descartar)", frontend: true, done: true },
+      { id: "T-010.7", text: "Frontend: correção de tom (action correct com draft)", frontend: true, done: true },
+      { id: "T-010.8", text: "Frontend: resumo da conversa (action summarize)", frontend: true, done: true },
+    ]
+  },
+  {
+    id: "ADR-011", fase: "fase4", title: "Editor visual de Flows / URA",
+    status: "inprogress",
+    tasks: [
+      { id: "T-011.1", text: "Model Flow + Migration (nodes/edges JSONB)", backend: true, done: true },
+      { id: "T-011.2", text: "FlowController CRUD + toggle ativo", backend: true, done: true },
+      { id: "T-011.3", text: "FlowExecutorService: state machine Redis (30min TTL)", backend: true, done: true },
+      { id: "T-011.4", text: "Executores: message / menu / queue / funnel / ai / end", backend: true, done: true },
+      { id: "T-011.5", text: "Frontend: canvas React Flow — DESCOPED (React 16 incompat; editor form-based no lugar)", frontend: true, done: true },
+      { id: "T-011.6", text: "Frontend: editor de nodes form-based (Message/Menu/Queue/Funnel/AI/End) — FlowNodeEditor", frontend: true, done: true },
+      { id: "T-011.7", text: "Frontend: edição inline por tipo de node (FlowNodeEditor)", frontend: true, done: true },
+      { id: "T-011.8", text: "Frontend: lista de fluxos + toolbar (novo, toggle, excluir) — page Flows", frontend: true, done: true },
+      { id: "T-011.9", text: "Testes unit FlowGraph (6 passando): findNode/findNextNode/resolveMenuTarget", test: true, done: true },
+    ]
+  },
+  {
+    id: "ADR-012", fase: "fase4", title: "CRM Kanban: funil 5 estágios",
+    status: "inprogress",
+    tasks: [
+      { id: "T-012.1", text: "Migration: funnelStage + dealValue em Tickets", backend: true, done: true },
+      { id: "T-012.2", text: "PATCH /tickets/:id/funnel", backend: true, done: true },
+      { id: "T-012.3", text: "GET /tickets/funnel: tickets agrupados por funnelStage + totais dealValue", backend: true, done: true },
+      { id: "T-012.4", text: "Instalar @dnd-kit/core 6.3 + sortable 7.0 (compat React 16.8)", frontend: true, done: true },
+      { id: "T-012.5", text: "Funnel board: 5 colunas + valor total (page Funnel)", frontend: true, done: true },
+      { id: "T-012.6", text: "KanbanCard: deal value + canal badge + avatar", frontend: true, done: true },
+      { id: "T-012.7", text: "Drag-and-drop entre colunas (@dnd-kit) + optimistic update + reverte on error", frontend: true, done: true },
+      { id: "T-012.8", text: "Seletor de estágio no header do ticket (TicketActionButtonsCustom)", frontend: true, done: true },
+      { id: "T-012.9", text: "Funnel responsivo (scroll horizontal) + touch drag via PointerSensor", frontend: true, done: true },
+    ]
+  },
+  {
+    id: "ADR-013", fase: "fase4", title: "Super Admin multi-tenant portal",
+    status: "inprogress",
+    tasks: [
+      { id: "T-013.1", text: "isSuperAdmin middleware (verifica User.super no DB)", backend: true, done: true },
+      { id: "T-013.2", text: "GET /super-admin/companies (filtros, paginação, plan)", backend: true, done: true },
+      { id: "T-013.3", text: "PATCH /super-admin/companies/:id/status + desconecta Evolution", backend: true, done: true },
+      { id: "T-013.4", text: "POST /super-admin/impersonate (JWT 2h com audit)", backend: true, done: true },
+      { id: "T-013.5", text: "GET /super-admin/metrics (total/active/trial/blocked)", backend: true, done: true },
+      { id: "T-013.6", text: "Frontend: link Super Admin no sidebar (guard user.super)", frontend: true, done: true },
+      { id: "T-013.7", text: "Frontend: tabela tenants (status pill, dueDate, bloquear/ativar/impersonar)", frontend: true, done: true },
+      { id: "T-013.8", text: "Frontend: cards de métricas (total/active/trial/blocked)", frontend: true, done: true },
+    ]
+  },
+  {
+    id: "ADR-014", fase: "fase5", title: "Real-time: Socket.io namespaces por canal",
+    status: "inprogress",
+    tasks: [
+      { id: "T-014.1", text: "socket.d.ts: tipos server→client + client→server", backend: true, done: true },
+      { id: "T-014.2", text: "socket.ts: room company:{id} auto-join + heartbeat 25s/60s", backend: true, done: true },
+      { id: "T-014.3", text: "Evento operatorPresence no socket.ts", backend: true, done: true },
+      { id: "T-014.4", text: "Evento comment:new + comment:replied (IG+LI → frontend)", backend: true, done: true },
+      { id: "T-014.5", text: "Evento channel:status (Evolution API → frontend)", backend: true, done: true },
+      { id: "T-014.6", text: "Frontend: hook useSocket (cleanup auto, off/on) — usado em Moderation/Funnel", frontend: true, done: true },
+      { id: "T-014.7", text: "Frontend: toast reconexão (connect/disconnect) + refetch on reconnect", frontend: true, done: true },
+    ]
+  },
+];
+
+// Storage
+const STORAGE_KEY = 'wpls-adr-tasks';
+function loadChecked() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch { return {}; }
+}
+function saveChecked(obj) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+}
+
+let checked = loadChecked();
+let currentFilter = 'all';
+
+function getTaskStatus(adr) {
+  const tasks = adr.tasks;
+  let done = tasks.filter(t => t.done || checked[t.id]).length;
+  return { done, total: tasks.length, pct: Math.round((done / tasks.length) * 100) };
+}
+
+function getCardStatus(adr) {
+  const { done, total } = getTaskStatus(adr);
+  if (done === total) return 'done';
+  if (done > 0) return 'inprogress';
+  return adr.status;
+}
+
+function statusLabel(s) {
+  if (s === 'done') return ['✅ Concluído', 'done'];
+  if (s === 'inprogress') return ['🔄 Em andamento', 'inprogress'];
+  return ['⬜ Pendente', 'pending'];
+}
+
+function faseLabel(fase) {
+  const map = { fase1: 'Fase 1', fase2: 'Fase 2', fase3: 'Fase 3', fase4: 'Fase 4', fase5: 'Fase 5' };
+  return map[fase] || fase;
+}
+
+function renderCards() {
+  const grid = document.getElementById('cardGrid');
+  grid.innerHTML = '';
+
+  let totalTasks = 0, doneTasks = 0;
+
+  ADRS.forEach(adr => {
+    const { done, total, pct } = getTaskStatus(adr);
+    const cardStatus = getCardStatus(adr);
+    totalTasks += total;
+    doneTasks += done;
+
+    // Filter
+    if (currentFilter !== 'all') {
+      if (['fase1','fase2','fase3','fase4','fase5'].includes(currentFilter) && adr.fase !== currentFilter) return;
+      if (currentFilter === 'done' && cardStatus !== 'done') return;
+      if (currentFilter === 'inprogress' && cardStatus !== 'inprogress') return;
+      if (currentFilter === 'pending' && cardStatus !== 'pending') return;
+    }
+
+    const [slabel, sclass] = statusLabel(cardStatus);
+    const card = document.createElement('div');
+    card.className = `adr-card ${cardStatus}`;
+    card.dataset.adr = adr.id;
+
+    card.innerHTML = `
+      <div class="card-header" onclick="toggleCard('${adr.id}')">
+        <div>
+          <div class="adr-id">${adr.id}</div>
+        </div>
+        <div class="card-info">
+          <div class="card-title">${adr.title}</div>
+          <div class="card-meta">
+            <span class="badge ${sclass}">${slabel}</span>
+            <span class="badge fase">${faseLabel(adr.fase)}</span>
+          </div>
+        </div>
+        <div class="chevron" id="chev-${adr.id}">▼</div>
+      </div>
+      <div class="card-progress">
+        <div class="mini-bar"><div class="mini-fill" style="width:${pct}%"></div></div>
+        <div class="mini-label">${done} / ${total} tarefas · ${pct}%</div>
+      </div>
+      <div class="task-list" id="tasks-${adr.id}">
+        ${adr.tasks.map(t => {
+          const isChecked = t.done || checked[t.id];
+          const tag = t.backend ? '🔧' : t.frontend ? '🎨' : t.test ? '🧪' : t.external ? '🌐' : '';
+          return `<div class="task-item ${isChecked ? 'checked' : ''}" onclick="toggleTask('${adr.id}','${t.id}',${!!t.done})" data-task="${t.id}">
+            <div class="task-check"></div>
+            <div class="task-text">${tag} ${t.text}</div>
+            <div class="task-id">${t.id}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  // Global progress
+  const gPct = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
+  document.getElementById('globalFill').style.width = gPct + '%';
+  document.getElementById('globalPct').textContent = gPct + '%';
+}
+
+function toggleCard(adrId) {
+  const tasks = document.getElementById('tasks-' + adrId);
+  const chev = document.getElementById('chev-' + adrId);
+  tasks.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+function toggleTask(adrId, taskId, hardDone) {
+  if (hardDone) return; // tarefas marcadas no código não são alteráveis
+  if (checked[taskId]) {
+    delete checked[taskId];
+  } else {
+    checked[taskId] = true;
+  }
+  saveChecked(checked);
+  renderCards();
+  // Re-open the card that was open
+  const tasks = document.getElementById('tasks-' + adrId);
+  const chev = document.getElementById('chev-' + adrId);
+  if (tasks) { tasks.classList.add('open'); chev.classList.add('open'); }
+}
+
+// Filters
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    currentFilter = this.dataset.filter;
+    renderCards();
+  });
+});
+
+renderCards();
+</script>
+</body>
+</html>

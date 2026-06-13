@@ -46,6 +46,12 @@ class Contact extends Model<Contact> {
   @Column
   channel: string;
 
+  @Column
+  channelUsername: string;
+
+  @Column
+  channelProfileUrl: string;
+
   @Default(false)
   @Column
   isGroup: boolean;

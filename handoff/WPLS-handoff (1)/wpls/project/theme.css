@@ -1,0 +1,162 @@
+/* ============================================================
+   OMNICHANNEL PLUS — Shared Design Tokens
+   Brand: Prefeitura Rio palette (#2a688f / #42b9eb + gradient)
+   Type:  Manrope (Cera Pro substitute)
+   Themes: .theme-light (Write) default · .theme-dark
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* Brand constants (theme-independent) */
+  --brand-deep:    #2a688f;   /* R42 G104 B143 */
+  --brand-blue:    #3b8bbf;
+  --brand-bright:  #42b9eb;   /* R66 G185 B235 */
+  --brand-grad:    linear-gradient(135deg, #2a688f 0%, #42b9eb 100%);
+  --brand-grad-soft: linear-gradient(135deg, rgba(42,104,143,.12) 0%, rgba(66,185,235,.12) 100%);
+
+  /* Channel brand colors (kept true) */
+  --wa-green:   #25D366;
+  --wa-deep:    #128C7E;
+  --ig-magenta: #d62976;
+  --ig-orange:  #f77737;
+  --ig-grad:    linear-gradient(45deg,#feda75 0%,#fa7e1e 28%,#d62976 60%,#962fbf 88%);
+
+  /* Status */
+  --ok:    #16a34a;
+  --warn:  #d97706;
+  --bad:   #dc2626;
+
+  /* Type */
+  --font: 'Manrope', system-ui, -apple-system, sans-serif;
+
+  /* Radii / shadow scale */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 22px;
+  --tap: 44px;                /* min touch target */
+}
+
+/* ---------- LIGHT (Write) ---------- */
+.theme-light {
+  --bg:        #f4f7fa;
+  --bg-2:      #eef3f8;
+  --surface:   #ffffff;
+  --surface-2: #f8fafc;
+  --raised:    #ffffff;
+  --border:    #e2e9f0;
+  --border-2:  #d3dde7;
+  --text:      #0f2533;
+  --text-2:    #4a6072;
+  --text-3:    #7d92a3;
+  --accent:    #2a688f;
+  --accent-bright: #2196d4;
+  --on-accent: #ffffff;
+  --chip:      #eef4f9;
+  --chip-text: #2a688f;
+  --shadow-sm: 0 1px 2px rgba(15,37,51,.06), 0 1px 3px rgba(15,37,51,.04);
+  --shadow-md: 0 4px 12px rgba(15,37,51,.07), 0 2px 4px rgba(15,37,51,.04);
+  --shadow-lg: 0 18px 40px -12px rgba(20,55,80,.22), 0 6px 14px rgba(15,37,51,.06);
+  --glass:     rgba(255,255,255,.72);
+}
+
+/* ---------- DARK ---------- */
+.theme-dark {
+  --bg:        #0a1018;
+  --bg-2:      #0d1622;
+  --surface:   #111c29;
+  --surface-2: #16222f;
+  --raised:    #1a2836;
+  --border:    #24323f;
+  --border-2:  #2e3f4f;
+  --text:      #eaf2f8;
+  --text-2:    #9db2c2;
+  --text-3:    #647889;
+  --accent:    #42b9eb;
+  --accent-bright: #5cc6f0;
+  --on-accent: #06141f;
+  --chip:      #18293a;
+  --chip-text: #7fd0f3;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.4);
+  --shadow-md: 0 6px 18px rgba(0,0,0,.45);
+  --shadow-lg: 0 24px 50px -12px rgba(0,0,0,.65), 0 8px 20px rgba(0,0,0,.4);
+  --glass:     rgba(17,28,41,.72);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Eyebrow label — echoes brand "USO EM TELAS" caps style */
+.eyebrow {
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* Buttons */
+.btn {
+  font-family: var(--font);
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--r-md);
+  min-height: var(--tap);
+  padding: 0 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 15px;
+  transition: transform .12s ease, box-shadow .2s ease, background .2s ease, opacity .2s;
+  white-space: nowrap;
+}
+.btn:active { transform: translateY(1px) scale(.99); }
+.btn svg { width: 18px; height: 18px; flex: none; }
+.btn-primary { background: var(--brand-grad); color: #fff; box-shadow: 0 6px 18px -6px rgba(42,104,143,.6); }
+.btn-primary:hover { box-shadow: 0 10px 24px -6px rgba(42,104,143,.7); }
+.btn-solid   { background: var(--accent); color: var(--on-accent); }
+.btn-ghost   { background: transparent; color: var(--text); border: 1px solid var(--border-2); }
+.btn-ghost:hover { background: var(--surface-2); }
+.btn-soft    { background: var(--chip); color: var(--chip-text); }
+
+/* Brand triangle motif (top-right signature from guide) */
+.tri {
+  width: 0; height: 0;
+  border-style: solid;
+  border-width: 0 26px 26px 0;
+  border-color: transparent var(--brand-bright) transparent transparent;
+}
+
+/* AI glow — subtle + soft pulse */
+@keyframes aiPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(66,185,235,.45); }
+  50%     { box-shadow: 0 0 0 7px rgba(66,185,235,0); }
+}
+@keyframes aiGlow {
+  0%,100% { opacity:.55; } 50% { opacity:1; }
+}
+.ai-pulse { animation: aiPulse 2.2s ease-out infinite; }
+.ai-glow  { animation: aiGlow 2.4s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-pulse, .ai-glow { animation: none; }
+}
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 20px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* Utility */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

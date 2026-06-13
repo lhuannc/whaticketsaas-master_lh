@@ -1,9 +1,12 @@
 import React, { useContext, useState } from "react";
 import { useHistory } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import { makeStyles, createTheme, ThemeProvider } from "@material-ui/core/styles";
-import { IconButton } from "@material-ui/core";
+import { IconButton, Select, MenuItem } from "@material-ui/core";
 import { MoreVert, Replay } from "@material-ui/icons";
+import SwapHorizIcon from "@material-ui/icons/SwapHoriz";
+import EmojiObjectsIcon from "@material-ui/icons/EmojiObjects";
 
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
@@ -16,6 +19,8 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import UndoRoundedIcon from '@material-ui/icons/UndoRounded';
 import Tooltip from '@material-ui/core/Tooltip';
 import { green } from '@material-ui/core/colors';
+import TransferModal from "../TransferModal";
+import CopilotDrawer from "../CopilotDrawer";
 
 
 const useStyles = makeStyles(theme => ({
@@ -35,6 +40,8 @@ const TicketActionButtonsCustom = ({ ticket }) => {
 	const history = useHistory();
 	const [anchorEl, setAnchorEl] = useState(null);
 	const [loading, setLoading] = useState(false);
+	const [transferOpen, setTransferOpen] = useState(false);
+	const [copilotOpen, setCopilotOpen] = useState(false);
 	const ticketOptionsMenuOpen = Boolean(anchorEl);
 	const { user } = useContext(AuthContext);
 	const { setCurrentTicket } = useContext(TicketsContext);
@@ -51,6 +58,16 @@ const TicketActionButtonsCustom = ({ ticket }) => {
 
 	const handleCloseTicketOptionsMenu = e => {
 		setAnchorEl(null);
+	};
+
+	const FUNNEL_STAGES = ["novo", "qualificado", "proposta", "negociacao", "ganho"];
+
+	const handleChangeFunnel = async (stage) => {
+		try {
+			await api.patch(`/tickets/${ticket.id}/funnel`, { funnelStage: stage });
+		} catch (err) {
+			toastError(err);
+		}
 	};
 
 	const handleUpdateTicketStatus = async (e, status, userId) => {
@@ -100,6 +117,28 @@ const TicketActionButtonsCustom = ({ ticket }) => {
 							</IconButton>
 						</Tooltip>
 					</ThemeProvider>
+					<Select
+						value={ticket.funnelStage || "novo"}
+						onChange={(e) => handleChangeFunnel(e.target.value)}
+						style={{ fontSize: 12, marginRight: 4 }}
+						title="Estágio do funil"
+					>
+						{FUNNEL_STAGES.map((s) => (
+							<MenuItem key={s} value={s}>{s}</MenuItem>
+						))}
+					</Select>
+					{ticket.channel === "whatsapp" && (
+						<Tooltip title="Transferir para outro número">
+							<IconButton onClick={() => setTransferOpen(true)}>
+								<SwapHorizIcon />
+							</IconButton>
+						</Tooltip>
+					)}
+					<Tooltip title="AI Copilot">
+						<IconButton onClick={() => setCopilotOpen(true)}>
+							<EmojiObjectsIcon style={{ color: "#42b9eb" }} />
+						</IconButton>
+					</Tooltip>
 					{/* <ButtonWithSpinner
 						loading={loading}
 						startIcon={<Replay />}
@@ -139,6 +178,22 @@ const TicketActionButtonsCustom = ({ ticket }) => {
 					{i18n.t("messagesList.header.buttons.accept")}
 				</ButtonWithSpinner>
 			)}
+
+			<TransferModal
+				open={transferOpen}
+				onClose={() => setTransferOpen(false)}
+				ticket={ticket}
+			/>
+			<CopilotDrawer
+				open={copilotOpen}
+				onClose={() => setCopilotOpen(false)}
+				ticketId={ticket.id}
+				draft=""
+				onUseSuggestion={(text) => {
+					if (navigator.clipboard) navigator.clipboard.writeText(text);
+					toast.info("Sugestão copiada — cole no campo de mensagem.");
+				}}
+			/>
 		</div>
 	);
 };

@@ -1,0 +1,65 @@
+services:
+  evolution-api:
+    image: atendai/evolution-api:v2.1.1
+    container_name: whaticket_evolution
+    restart: always
+    ports:
+      - "8081:8080"
+    environment:
+      # Auth — usar mesma chave em EVOLUTION_API_KEY no backend/.env
+      AUTHENTICATION_API_KEY: ${EVOLUTION_API_KEY:-change-me-evolution-key}
+      AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES: "true"
+
+      # Server
+      SERVER_URL: http://localhost:8081
+
+      # Database (Postgres dedicado)
+      DATABASE_ENABLED: "true"
+      DATABASE_PROVIDER: postgresql
+      DATABASE_CONNECTION_URI: postgresql://evolution_user:evolution_pass@evolution-postgres:5432/evolution_db
+      DATABASE_SAVE_DATA_INSTANCE: "true"
+      DATABASE_SAVE_DATA_NEW_MESSAGE: "true"
+      DATABASE_SAVE_MESSAGE_UPDATE: "true"
+      DATABASE_SAVE_DATA_CONTACTS: "true"
+      DATABASE_SAVE_DATA_CHATS: "true"
+
+      # Cache (Redis dedicado)
+      CACHE_REDIS_ENABLED: "true"
+      CACHE_REDIS_URI: redis://evolution-redis:6379/0
+      CACHE_REDIS_PREFIX_KEY: evolution
+      CACHE_LOCAL_ENABLED: "false"
+
+      # Webhook global → backend WhaTicket
+      WEBHOOK_GLOBAL_ENABLED: "false"
+
+      # Logs
+      LOG_LEVEL: ERROR
+      LOG_COLOR: "true"
+    depends_on:
+      - evolution-postgres
+      - evolution-redis
+    volumes:
+      - evolution_instances:/evolution/instances
+
+  evolution-postgres:
+    image: postgres:15-alpine
+    container_name: whaticket_evolution_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: evolution_user
+      POSTGRES_PASSWORD: evolution_pass
+      POSTGRES_DB: evolution_db
+    volumes:
+      - evolution_pgdata:/var/lib/postgresql/data
+
+  evolution-redis:
+    image: redis:7-alpine
+    container_name: whaticket_evolution_redis
+    restart: always
+    volumes:
+      - evolution_redisdata:/data
+
+volumes:
+  evolution_instances:
+  evolution_pgdata:
+  evolution_redisdata:

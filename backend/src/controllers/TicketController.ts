@@ -9,6 +9,9 @@ import ShowTicketUUIDService from "../services/TicketServices/ShowTicketFromUUID
 import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import UpdateTicketService from "../services/TicketServices/UpdateTicketService";
 import ListTicketsServiceKanban from "../services/TicketServices/ListTicketsServiceKanban";
+import ListTicketsFunnelService from "../services/TicketServices/ListTicketsFunnelService";
+import TransferInstanceService from "../services/TicketServices/TransferInstanceService";
+import ForwardTicketService from "../services/TicketServices/ForwardTicketService";
 
 type IndexQuery = {
   searchParam: string;
@@ -216,4 +219,72 @@ export const remove = async (
     });
 
   return res.status(200).json({ message: "ticket deleted" });
+};
+
+export const funnel = async (req: Request, res: Response): Promise<Response> => {
+  const { companyId } = req.user;
+  const { funnelStage, queueIds: queueIdsStringified } = req.query as Record<string, string>;
+
+  let queueIds: number[] = [];
+  if (queueIdsStringified) {
+    queueIds = JSON.parse(queueIdsStringified);
+  }
+
+  const { stages, totals } = await ListTicketsFunnelService({
+    companyId,
+    funnelStage,
+    userId: req.user.id,
+    queueIds
+  });
+
+  return res.status(200).json({ stages, totals });
+};
+
+export const transferInstance = async (req: Request, res: Response): Promise<Response> => {
+  const { ticketId } = req.params;
+  const { targetWhatsappId, notifyContact, transferMessage } = req.body;
+  const { companyId } = req.user;
+
+  const ticket = await TransferInstanceService({
+    ticketId,
+    targetWhatsappId,
+    companyId,
+    notifyContact,
+    transferMessage
+  });
+
+  return res.status(200).json(ticket);
+};
+
+export const forwardTicket = async (req: Request, res: Response): Promise<Response> => {
+  const { ticketId } = req.params;
+  const { targetNumber, includeHistory, historyLimit } = req.body;
+  const { companyId } = req.user;
+
+  await ForwardTicketService({ ticketId, targetNumber, companyId, includeHistory, historyLimit });
+
+  return res.status(200).json({ message: "Conversa encaminhada com sucesso." });
+};
+
+export const updateFunnel = async (req: Request, res: Response): Promise<Response> => {
+  const { ticketId } = req.params;
+  const { funnelStage, dealValue } = req.body;
+  const { companyId } = req.user;
+
+  const ticket = await ShowTicketService(ticketId, companyId);
+
+  const updates: Record<string, any> = {};
+  if (funnelStage !== undefined) updates.funnelStage = funnelStage;
+  if (dealValue !== undefined) updates.dealValue = dealValue;
+
+  await ticket.update(updates);
+
+  const io = getIO();
+  io.to(`company:${companyId}`).emit(`company-${companyId}-ticket`, {
+    action: "funnel-updated",
+    ticket,
+    ticketId: ticket.id
+  });
+
+  return res.status(200).json(ticket);
 };

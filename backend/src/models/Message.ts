@@ -45,6 +45,12 @@ class Message extends Model<Message> {
   @Column({ defaultValue: "whatsapp" })
   channel: string;
 
+  @Column(DataType.STRING)
+  externalId: string;
+
+  @Column({ allowNull: true })
+  parentCommentId: number;
+
   @Column(DataType.TEXT)
   body: string;
 

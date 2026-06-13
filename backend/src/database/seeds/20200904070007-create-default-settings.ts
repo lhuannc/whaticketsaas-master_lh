@@ -84,6 +84,27 @@ module.exports = {
         companyId: 1,
         createdAt: new Date(),
         updatedAt: new Date()
+      },
+      {
+        key: "aiTone",
+        value: "cordial",
+        companyId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        key: "aiPersona",
+        value: "Você é um assistente de atendimento ao cliente educado e prestativo.",
+        companyId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        key: "aiKnowledgeBase",
+        value: "[]",
+        companyId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
       }
     ];
 

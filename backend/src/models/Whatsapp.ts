@@ -117,6 +117,9 @@ class Whatsapp extends Model<Whatsapp> {
 
   @Column(DataType.TEXT)
   channel: string;
+
+  @Column(DataType.STRING)
+  evolutionInstanceName: string;
 }
 
 export default Whatsapp;

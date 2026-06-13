@@ -340,6 +340,18 @@ const MainListItems = (props) => {
       />
 
       <ListItemLink
+        to="/moderation"
+        primary="Moderação"
+        icon={<ContactlessOutlinedIcon />}
+      />
+
+      <ListItemLink
+        to="/funnel"
+        primary="Funil CRM"
+        icon={<PieChartOutlinedIcon />}
+      />
+
+      <ListItemLink
         to="/chats"
         primary={i18n.t("mainDrawer.listItems.chats")}
         icon={
@@ -434,6 +446,26 @@ const MainListItems = (props) => {
               }
             />
             <ListItemLink
+              to="/channels"
+              primary="Canais (IG/LinkedIn)"
+              icon={<ExploreOutlinedIcon />}
+            />
+            <ListItemLink
+              to="/ia-config"
+              primary="IA (Persona/RAG)"
+              icon={<OfflineBoltOutlinedIcon />}
+            />
+            <ListItemLink
+              to="/flows"
+              primary="Fluxos / URA"
+              icon={<AccountTreeOutlinedIcon />}
+            />
+            <ListItemLink
+              to="/management"
+              primary="Gestão (Hub)"
+              icon={<SettingsOutlinedIcon />}
+            />
+            <ListItemLink
               to="/queues"
               primary={i18n.t("mainDrawer.listItems.queues")}
               icon={<WrapTextOutlinedIcon />}
@@ -458,6 +490,13 @@ const MainListItems = (props) => {
               primary={i18n.t("mainDrawer.listItems.settings")}
               icon={<SettingsOutlinedIcon />}
             />
+            {user.super && (
+              <ListItemLink
+                to="/super-admin"
+                primary="Super Admin"
+                icon={<PeopleIcon />}
+              />
+            )}
 {/*             <ListItemLink
               to="/subscription"
               primary="Assinatura"

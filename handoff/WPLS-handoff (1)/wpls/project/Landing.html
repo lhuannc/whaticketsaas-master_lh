@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Omnichannel Plus — Vitrine</title>
+<link rel="stylesheet" href="theme.css" />
+<style>
+  /* ---------- Landing-specific ---------- */
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 22px; }
+
+  /* Nav */
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: blur(14px);
+    background: var(--glass);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-in { display: flex; align-items: center; gap: 18px; height: 68px; }
+  .brand { display: flex; align-items: center; gap: 11px; font-weight: 800; font-size: 18px; letter-spacing: -.01em; }
+  .logo-mark {
+    width: 34px; height: 34px; border-radius: 9px; background: var(--brand-grad);
+    display: grid; place-items: center; position: relative; overflow: hidden; flex: none;
+    box-shadow: 0 4px 12px -3px rgba(42,104,143,.55);
+  }
+  .logo-mark svg { width: 20px; height: 20px; }
+  .nav-links { display: flex; gap: 4px; margin-left: 10px; }
+  .nav-links a { color: var(--text-2); text-decoration: none; font-weight: 600; font-size: 14.5px; padding: 8px 13px; border-radius: 9px; }
+  .nav-links a:hover { color: var(--text); background: var(--surface-2); }
+  .nav-spacer { flex: 1; }
+  .icon-btn {
+    width: 42px; height: 42px; border-radius: 11px; border: 1px solid var(--border-2);
+    background: var(--surface); color: var(--text); cursor: pointer; display: grid; place-items: center;
+    transition: background .2s, transform .12s;
+  }
+  .icon-btn:hover { background: var(--surface-2); }
+  .icon-btn:active { transform: scale(.94); }
+
+  /* Hero */
+  .hero { position: relative; overflow: hidden; padding: 64px 0 36px; }
+  .hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 48px; align-items: center; }
+  .hero-pill {
+    display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px 7px 9px; border-radius: 999px;
+    background: var(--chip); color: var(--chip-text); font-weight: 700; font-size: 13px; margin-bottom: 22px;
+    border: 1px solid var(--border);
+  }
+  .hero-pill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--brand-bright); }
+  h1.hero-title {
+    font-size: clamp(38px, 5.4vw, 62px); line-height: 1.03; letter-spacing: -.025em; font-weight: 800; margin: 0 0 20px;
+  }
+  .grad-text { background: var(--brand-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero-sub { font-size: clamp(16px, 1.6vw, 19px); color: var(--text-2); line-height: 1.55; max-width: 540px; margin: 0 0 30px; font-weight: 500; }
+  .hero-cta { display: flex; gap: 13px; flex-wrap: wrap; align-items: center; }
+  .hero-trust { display: flex; gap: 22px; margin-top: 28px; flex-wrap: wrap; }
+  .hero-trust div { font-size: 13.5px; color: var(--text-3); font-weight: 600; display: flex; align-items: center; gap: 7px; }
+  .hero-trust b { color: var(--text); font-size: 20px; font-weight: 800; }
+
+  .blob { position: absolute; border-radius: 50%; filter: blur(70px); opacity: .5; z-index: -1; }
+  .blob-1 { width: 420px; height: 420px; background: radial-gradient(circle,#42b9eb,transparent 70%); top: -120px; right: -80px; }
+  .blob-2 { width: 360px; height: 360px; background: radial-gradient(circle,#2a688f,transparent 70%); bottom: -160px; left: -120px; opacity:.35; }
+
+  /* Hero product mock */
+  .mock {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-xl);
+    box-shadow: var(--shadow-lg); overflow: hidden; transform: rotate(.6deg);
+  }
+  .mock-top { display: flex; align-items: center; gap: 7px; padding: 13px 16px; border-bottom: 1px solid var(--border); background: var(--surface-2); }
+  .mock-top .tl { width: 11px; height: 11px; border-radius: 50%; }
+  .mock-row { display: flex; gap: 11px; padding: 13px 16px; align-items: center; border-bottom: 1px solid var(--border); }
+  .mock-row:last-child { border-bottom: none; }
+  .av { width: 42px; height: 42px; border-radius: 12px; flex: none; display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 15px; position: relative; }
+  .ch-badge { position: absolute; bottom: -3px; right: -3px; width: 19px; height: 19px; border-radius: 7px; display: grid; place-items: center; border: 2px solid var(--surface); }
+  .ch-badge svg { width: 11px; height: 11px; }
+  .mock-name { font-weight: 700; font-size: 14.5px; }
+  .mock-msg { font-size: 13px; color: var(--text-2); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+  .mock-meta { margin-left: auto; text-align: right; flex: none; }
+  .mock-time { font-size: 11px; color: var(--text-3); font-weight: 600; }
+  .ai-tag { display: inline-flex; align-items: center; gap: 5px; margin-top: 6px; padding: 3px 8px; border-radius: 999px; background: var(--brand-grad-soft); color: var(--accent-bright); font-size: 10px; font-weight: 800; border: 1px solid rgba(66,185,235,.3); white-space: nowrap; }
+  .mock-meta { display: flex; flex-direction: column; align-items: flex-end; }
+  .ai-tag .spark { width: 7px; height: 7px; border-radius: 50%; background: var(--brand-bright); }
+
+  /* Section */
+  .section { padding: 74px 0; }
+  .section-head { text-align: center; max-width: 680px; margin: 0 auto 50px; }
+  .section-head h2 { font-size: clamp(28px, 3.4vw, 42px); font-weight: 800; letter-spacing: -.02em; margin: 12px 0 14px; line-height: 1.08; }
+  .section-head p { color: var(--text-2); font-size: 17px; line-height: 1.5; margin: 0; font-weight: 500; }
+
+  /* Features bento */
+  .bento { display: grid; grid-template-columns: repeat(6,1fr); gap: 18px; }
+  .feat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 26px; position: relative; overflow: hidden; box-shadow: var(--shadow-sm); transition: transform .2s, box-shadow .2s; }
+  .feat:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+  .feat.big { grid-column: span 3; }
+  .feat.sm  { grid-column: span 2; }
+  .feat.wide { grid-column: span 6; display: flex; gap: 30px; align-items: center; }
+  .feat-ic { width: 50px; height: 50px; border-radius: 13px; display: grid; place-items: center; margin-bottom: 18px; background: var(--brand-grad-soft); border: 1px solid var(--border); }
+  .feat-ic svg { width: 25px; height: 25px; color: var(--accent); }
+  .feat h3 { font-size: 19px; font-weight: 800; margin: 0 0 9px; letter-spacing: -.01em; }
+  .feat p { color: var(--text-2); font-size: 14.5px; line-height: 1.55; margin: 0; font-weight: 500; }
+  .chip-row { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+  .chip { font-size: 12px; font-weight: 700; padding: 6px 11px; border-radius: 999px; background: var(--chip); color: var(--chip-text); display: inline-flex; align-items: center; gap: 6px; }
+
+  /* Pricing */
+  .price-toggle { display: inline-flex; gap: 4px; padding: 4px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; margin: 0 auto 38px; }
+  .price-toggle button { border: none; background: transparent; font-family: var(--font); font-weight: 700; font-size: 14px; padding: 9px 18px; border-radius: 999px; cursor: pointer; color: var(--text-2); min-height: 40px; }
+  .price-toggle button.on { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+  .price-toggle .save { font-size: 11px; color: var(--ok); font-weight: 800; margin-left: 5px; }
+  .plans { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; align-items: stretch; }
+  .plan { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-xl); padding: 30px 26px; display: flex; flex-direction: column; box-shadow: var(--shadow-sm); position: relative; }
+  .plan.pop { border: 2px solid transparent; background:
+      linear-gradient(var(--surface),var(--surface)) padding-box,
+      var(--brand-grad) border-box; box-shadow: var(--shadow-lg); transform: translateY(-6px); }
+  .plan-badge { position: absolute; top: -13px; left: 50%; transform: translateX(-50%); background: var(--brand-grad); color: #fff; font-size: 11.5px; font-weight: 800; padding: 6px 14px; border-radius: 999px; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; z-index: 3; box-shadow: 0 6px 14px -4px rgba(42,104,143,.6); }
+  .plan h3 { font-size: 16px; font-weight: 800; margin: 0 0 6px; letter-spacing: .02em; text-transform: uppercase; color: var(--accent); }
+  .plan .desc { color: var(--text-2); font-size: 13.5px; margin: 0 0 20px; min-height: 38px; font-weight: 500; }
+  .plan .price { display: flex; align-items: baseline; gap: 4px; margin-bottom: 4px; }
+  .plan .price .cur { font-size: 20px; font-weight: 700; color: var(--text-2); }
+  .plan .price .amt { font-size: 46px; font-weight: 800; letter-spacing: -.03em; }
+  .plan .price .per { font-size: 14px; color: var(--text-3); font-weight: 600; }
+  .plan .annual-note { font-size: 12.5px; color: var(--text-3); margin: 0 0 22px; font-weight: 600; min-height: 17px; }
+  .plan ul { list-style: none; padding: 0; margin: 6px 0 26px; display: flex; flex-direction: column; gap: 13px; flex: 1; }
+  .plan li { display: flex; gap: 11px; font-size: 14px; color: var(--text); align-items: flex-start; font-weight: 500; }
+  .plan li svg { width: 18px; height: 18px; color: var(--accent-bright); flex: none; margin-top: 1px; }
+  .plan li b { font-weight: 800; }
+  .plan li.muted { color: var(--text-3); }
+  .plan li.muted svg { color: var(--text-3); }
+
+  /* CTA band */
+  .cta-band { background: var(--brand-grad); border-radius: var(--r-xl); padding: 54px 40px; text-align: center; position: relative; overflow: hidden; box-shadow: var(--shadow-lg); }
+  .cta-band h2 { color: #fff; font-size: clamp(26px,3.2vw,38px); font-weight: 800; margin: 0 0 12px; letter-spacing: -.02em; }
+  .cta-band p { color: rgba(255,255,255,.9); font-size: 17px; margin: 0 0 26px; font-weight: 500; }
+  .cta-band .btn { background: #fff; color: var(--brand-deep); }
+
+  /* Footer */
+  footer { border-top: 1px solid var(--border); padding: 40px 0; margin-top: 10px; }
+  .foot-in { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; color: var(--text-3); font-size: 13.5px; font-weight: 600; }
+
+  /* Responsive */
+  @media (max-width: 920px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 38px; }
+    .hero-mock-col { order: 2; }
+    .bento { grid-template-columns: repeat(2,1fr); }
+    .feat.big, .feat.sm { grid-column: span 1; }
+    .feat.wide { grid-column: span 2; flex-direction: column; align-items: flex-start; gap: 18px; }
+    .plans { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
+    .plan.pop { transform: none; }
+    .nav-links { display: none; }
+  }
+  @media (max-width: 560px) {
+    .bento { grid-template-columns: 1fr; }
+    .feat.wide { grid-column: span 1; }
+    .section { padding: 54px 0; }
+    .hero { padding: 40px 0 20px; }
+    .cta-band { padding: 40px 22px; }
+  }
+</style>
+</head>
+<body class="theme-light">
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect } = React;
+
+/* ---- Icons (inline, stroke) ---- */
+const I = {
+  bolt:  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>,
+  inbox: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>,
+  spark: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/></svg>,
+  kanban:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="6" height="13" rx="1.5"/><rect x="15" y="3" width="6" height="9" rx="1.5"/><path d="M9 7h6"/></svg>,
+  shield:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+  chart: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>,
+  check: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>,
+  sun:   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>,
+  moon:  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>,
+  arrow: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>,
+};
+const Wa = ({s=12}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="#fff"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>;
+const Ig = ({s=12}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="#fff"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.69 4.92 4.92.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-3.26-.15-4.77-1.7-4.92-4.92-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85C2.38 3.92 3.9 2.38 7.15 2.23 8.42 2.17 8.8 2.16 12 2.16zM12 0C8.74 0 8.33.01 7.05.07 2.7.27.27 2.69.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.2 4.36 2.62 6.78 6.98 6.98C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c4.35-.2 6.78-2.62 6.98-6.98.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.2-4.35-2.62-6.78-6.98-6.98C15.67.01 15.26 0 12 0zm0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.41-10.85a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88z"/></svg>;
+
+function useTheme() {
+  const [theme, setTheme] = useState(() => localStorage.getItem('ocp-theme') || 'light');
+  useEffect(() => {
+    document.body.className = 'theme-' + theme;
+    localStorage.setItem('ocp-theme', theme);
+  }, [theme]);
+  return [theme, () => setTheme(t => t === 'light' ? 'dark' : 'light')];
+}
+
+function Logo() {
+  return (
+    <div className="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+        <circle cx="9" cy="11.5" r="1" fill="#fff" stroke="none"/><circle cx="12" cy="11.5" r="1" fill="#fff" stroke="none"/><circle cx="15" cy="11.5" r="1" fill="#fff" stroke="none"/>
+      </svg>
+    </div>
+  );
+}
+
+function Nav({ theme, toggle }) {
+  return (
+    <nav className="nav"><div className="wrap"><div className="nav-in">
+      <div className="brand"><Logo /> Omnichannel<span style={{color:'var(--accent)'}}>Plus</span></div>
+      <div className="nav-links">
+        <a href="#features">Recursos</a>
+        <a href="#pricing">Planos</a>
+        <a href="Operator Desktop.html">App do Operador</a>
+        <a href="Management Desktop.html">Gestão</a>
+      </div>
+      <div className="nav-spacer"></div>
+      <button className="icon-btn" onClick={toggle} title="Alternar tema">{theme === 'light' ? I.moon : I.sun}</button>
+      <a className="btn btn-primary" href="#pricing" style={{minHeight:42}}>Teste Grátis {I.arrow}</a>
+    </div></div></nav>
+  );
+}
+
+function HeroMock() {
+  const rows = [
+    { n:'Mariana Costa', m:'Oi! Vi o anúncio do plano Pro…', ch:'wa', t:'09:42', col:'#7c3aed', ai:true },
+    { n:'@joao.designer', m:'Vocês integram com Instagram?', ch:'ig', t:'09:38', col:'#db2777', ai:false },
+    { n:'Carlos — Loja Sul', m:'Fechado, pode emitir a nota 👍', ch:'wa', t:'09:21', col:'#2563eb', ai:false },
+  ];
+  return (
+    <div className="mock">
+      <div className="mock-top">
+        <span className="tl" style={{background:'#ff5f57'}}></span>
+        <span className="tl" style={{background:'#febc2e'}}></span>
+        <span className="tl" style={{background:'#28c840'}}></span>
+        <span style={{marginLeft:10,fontSize:12.5,fontWeight:700,color:'var(--text-2)'}}>Caixa de Entrada Unificada</span>
+      </div>
+      {rows.map((r,i) => (
+        <div className="mock-row" key={i}>
+          <div className="av" style={{background:r.col}}>
+            {r.n.replace('@','').slice(0,1).toUpperCase()}
+            <span className="ch-badge" style={{background: r.ch==='wa' ? 'var(--wa-green)' : undefined, backgroundImage: r.ch==='ig' ? 'var(--ig-grad)' : undefined}}>
+              {r.ch==='wa' ? <Wa s={10}/> : <Ig s={10}/>}
+            </span>
+          </div>
+          <div style={{minWidth:0}}>
+            <div className="mock-name">{r.n}</div>
+            <div className="mock-msg">{r.m}</div>
+          </div>
+          <div className="mock-meta">
+            <div className="mock-time">{r.t}</div>
+            {r.ai && <div className="ai-tag ai-glow"><span className="spark ai-pulse"></span>IA atendendo</div>}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Hero() {
+  return (
+    <header className="hero"><div className="blob blob-1"></div><div className="blob blob-2"></div>
+      <div className="wrap"><div className="hero-grid">
+        <div>
+          <div className="hero-pill"><span className="dot ai-pulse"></span> Evolution API · WhatsApp · Instagram · IA</div>
+          <h1 className="hero-title">Toda conversa do seu negócio em <span className="grad-text">um só lugar</span>, turbinada por IA.</h1>
+          <p className="hero-sub">Unifique WhatsApp e Instagram numa única caixa de entrada. Deixe o Copiloto de IA atender, resumir e sugerir respostas — sua equipe foca no que importa: vender.</p>
+          <div className="hero-cta">
+            <a className="btn btn-primary" href="#pricing" style={{fontSize:16,padding:'0 26px'}}>Comece seu Teste Grátis {I.arrow}</a>
+            <a className="btn btn-ghost" href="Operator Desktop.html">Ver demonstração</a>
+          </div>
+          <div className="hero-trust">
+            <div><b>+2.4M</b> mensagens/mês</div>
+            <div><b>3</b> canais nativos</div>
+            <div><b>14 dias</b> grátis · sem cartão</div>
+          </div>
+        </div>
+        <div className="hero-mock-col"><HeroMock /></div>
+      </div></div>
+    </header>
+  );
+}
+
+function Features() {
+  return (
+    <section className="section" id="features"><div className="wrap">
+      <div className="section-head">
+        <div className="eyebrow">Plataforma</div>
+        <h2>Um ecossistema completo de atendimento</h2>
+        <p>Da primeira mensagem ao fechamento do negócio — operação omnichannel com inteligência artificial nativa.</p>
+      </div>
+      <div className="bento">
+        <div className="feat big">
+          <div className="feat-ic">{I.inbox}</div>
+          <h3>Caixa de Entrada Unificada</h3>
+          <p>WhatsApp (Oficial e não oficial) e Instagram Direct na mesma tela. Filas, tags e roteamento automático por departamento — nada se perde entre os canais.</p>
+          <div className="chip-row">
+            <span className="chip"><Wa s={12}/> WhatsApp</span>
+            <span className="chip" style={{background:'var(--ig-grad)',color:'#fff'}}><Ig s={12}/> Instagram</span>
+            <span className="chip">Filas & Tags</span>
+          </div>
+        </div>
+        <div className="feat sm" style={{display:'flex',flexDirection:'column'}}>
+          <div className="feat-ic" style={{background:'var(--brand-grad)',border:'none'}}><span style={{color:'#fff',display:'grid',placeItems:'center'}}>{I.spark}</span></div>
+          <h3>IA Copilot</h3>
+          <p>Resuma conversas, sugira a próxima resposta e corrija o tom em um clique. A IA pode atender sozinha e passar para um humano quando necessário.</p>
+        </div>
+        <div className="feat sm">
+          <div className="feat-ic">{I.shield}</div>
+          <h3>Moderação de Comentários</h3>
+          <p>Responda, oculte ou converta comentários do Instagram em tickets de venda direto pelo painel.</p>
+        </div>
+        <div className="feat sm">
+          <div className="feat-ic">{I.kanban}</div>
+          <h3>CRM Kanban</h3>
+          <p>Funil de vendas visual. Arraste leads entre etapas e abra o chat sem trocar de aba.</p>
+        </div>
+        <div className="feat sm">
+          <div className="feat-ic">{I.chart}</div>
+          <h3>Multi-tenant SaaS</h3>
+          <p>Gerencie várias empresas, planos e limites de uso a partir de um painel de Super Admin.</p>
+        </div>
+      </div>
+    </div></section>
+  );
+}
+
+const PLANS = [
+  { name:'Básico', desc:'Para autônomos e pequenas equipes começando no omnichannel.',
+    m:97, y:79, pop:false,
+    feats:[['1 conexão WhatsApp', true],['3 usuários', true],['Caixa unificada', true],['Tags & filas', true],['IA Copilot', false],['Comentários Instagram', false]] },
+  { name:'Pro', desc:'Para equipes em crescimento que precisam de IA e Instagram.',
+    m:247, y:197, pop:true,
+    feats:[['3 conexões (Whats + Insta)', true],['10 usuários', true],['IA Copilot completo', true],['Moderação de comentários', true],['CRM Kanban', true],['Automação de filas', true]] },
+  { name:'Enterprise', desc:'Operações de alto volume com governança e suporte dedicado.',
+    m:597, y:497, pop:false,
+    feats:[['Conexões ilimitadas', true],['Usuários ilimitados', true],['IA dedicada + treino', true],['Multi-tenant & SSO', true],['SLA e suporte prioritário', true],['Gerente de conta', true]] },
+];
+
+function Pricing() {
+  const [annual, setAnnual] = useState(true);
+  return (
+    <section className="section" id="pricing" style={{background:'var(--bg-2)'}}><div className="wrap">
+      <div className="section-head">
+        <div className="eyebrow">Planos</div>
+        <h2>Preço simples, que cresce com você</h2>
+        <p>Comece grátis por 14 dias. Sem cartão de crédito. Cancele quando quiser.</p>
+      </div>
+      <div style={{display:'flex',justifyContent:'center'}}>
+        <div className="price-toggle">
+          <button className={!annual?'on':''} onClick={()=>setAnnual(false)}>Mensal</button>
+          <button className={annual?'on':''} onClick={()=>setAnnual(true)}>Anual <span className="save">−20%</span></button>
+        </div>
+      </div>
+      <div className="plans">
+        {PLANS.map(p => (
+          <div className={'plan'+(p.pop?' pop':'')} key={p.name}>
+            {p.pop && <div className="plan-badge">Mais popular</div>}
+            <h3>{p.name}</h3>
+            <p className="desc">{p.desc}</p>
+            <div className="price"><span className="cur">R$</span><span className="amt">{annual?p.y:p.m}</span><span className="per">/mês</span></div>
+            <p className="annual-note">{annual ? `Cobrado R$ ${p.y*12} por ano` : 'Cobrança mensal'}</p>
+            <ul>
+              {p.feats.map(([f,on],i)=>(
+                <li className={on?'':'muted'} key={i}>
+                  {on ? I.check : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>}
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+            <a className={'btn '+(p.pop?'btn-primary':'btn-ghost')} href="Management Desktop.html">Assinar Agora</a>
+          </div>
+        ))}
+      </div>
+    </div></section>
+  );
+}
+
+function CtaBand() {
+  return (
+    <section className="section" style={{paddingTop:0}}><div className="wrap">
+      <div className="cta-band">
+        <h2>Pronto para unificar seu atendimento?</h2>
+        <p>Junte WhatsApp, Instagram e IA em minutos. Seus clientes não esperam.</p>
+        <a className="btn" href="#pricing">Comece seu Teste Grátis {I.arrow}</a>
+      </div>
+    </div></section>
+  );
+}
+
+function App() {
+  const [theme, toggle] = useTheme();
+  return (
+    <React.Fragment>
+      <Nav theme={theme} toggle={toggle} />
+      <Hero />
+      <Features />
+      <Pricing />
+      <CtaBand />
+      <footer><div className="wrap"><div className="foot-in">
+        <div className="brand" style={{fontSize:16}}><Logo /> Omnichannel<span style={{color:'var(--accent)'}}>Plus</span></div>
+        <div>© 2026 Omnichannel Plus · Construído sobre Evolution API</div>
+      </div></div></footer>
+    </React.Fragment>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

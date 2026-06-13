@@ -21,6 +21,7 @@ import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 
 import MainListItems from "./MainListItems";
+import MobileBottomNav from "../components/MobileBottomNav";
 import NotificationsPopOver from "../components/NotificationsPopOver";
 import UserModal from "../components/UserModal";
 import { AuthContext } from "../context/Auth/AuthContext";
@@ -357,6 +358,7 @@ const LoggedInLayout = ({ children }) => {
 
         {children ? children : null}
       </main>
+      <MobileBottomNav />
     </div>
   );
 };

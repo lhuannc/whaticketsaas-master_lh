@@ -1,0 +1,108 @@
+import { subHours } from "date-fns";
+import { Op } from "sequelize";
+import Contact from "../../models/Contact";
+import Ticket from "../../models/Ticket";
+import ShowTicketService from "./ShowTicketService";
+import FindOrCreateATicketTrakingService from "./FindOrCreateATicketTrakingService";
+
+// Mesmas regras de FindOrCreateTicketServiceMeta:
+// - Recontato em ticket fechado → reabre com userId=null, status=pending (não cria novo)
+// - Só cria ticket novo se não existir histórico
+
+const FindOrCreateTicketServiceLinkedin = async (
+  contact: Contact,
+  linkedinAccountId: number,
+  unreadMessages: number,
+  companyId: number
+): Promise<Ticket> => {
+  const channel = "linkedin";
+
+  let ticket = await Ticket.findOne({
+    where: {
+      status: { [Op.or]: ["open", "pending", "closed"] },
+      contactId: contact.id,
+      companyId,
+      channel
+    },
+    order: [["id", "DESC"]]
+  });
+
+  if (ticket) {
+    await ticket.update({ unreadMessages });
+  }
+
+  if (!ticket) {
+    ticket = await Ticket.findOne({
+      where: { contactId: contact.id, channel },
+      order: [["updatedAt", "DESC"]]
+    });
+
+    if (ticket) {
+      await ticket.update({
+        status: "pending",
+        userId: null,
+        unreadMessages,
+        companyId,
+        channel
+      });
+      await FindOrCreateATicketTrakingService({
+        ticketId: ticket.id,
+        companyId,
+        whatsappId: ticket.whatsappId,
+        userId: ticket.userId,
+        channel
+      });
+    }
+  }
+
+  if (!ticket) {
+    ticket = await Ticket.findOne({
+      where: {
+        updatedAt: { [Op.between]: [+subHours(new Date(), 2), +new Date()] },
+        contactId: contact.id
+      },
+      order: [["updatedAt", "DESC"]]
+    });
+
+    if (ticket) {
+      await ticket.update({
+        status: "pending",
+        userId: null,
+        unreadMessages,
+        companyId,
+        channel
+      });
+      await FindOrCreateATicketTrakingService({
+        ticketId: ticket.id,
+        companyId,
+        whatsappId: ticket.whatsappId,
+        userId: ticket.userId,
+        channel
+      });
+    }
+  }
+
+  if (!ticket) {
+    ticket = await Ticket.create({
+      contactId: contact.id,
+      status: "pending",
+      isGroup: false,
+      unreadMessages,
+      companyId,
+      channel
+    });
+
+    await FindOrCreateATicketTrakingService({
+      ticketId: ticket.id,
+      companyId,
+      userId: ticket.userId,
+      channel
+    });
+  }
+
+  ticket = await ShowTicketService(ticket.id, companyId);
+
+  return ticket;
+};
+
+export default FindOrCreateTicketServiceLinkedin;

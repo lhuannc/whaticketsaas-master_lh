@@ -4,6 +4,7 @@ import {
   CreatedAt,
   UpdatedAt,
   Model,
+  DataType,
   PrimaryKey,
   ForeignKey,
   BelongsTo,
@@ -24,6 +25,7 @@ import Company from "./Company";
 import QueueOption from "./QueueOption";
 import Tag from "./Tag";
 import TicketTag from "./TicketTag";
+import Comment from "./Comment";
 
 @Table
 class Ticket extends Model<Ticket> {
@@ -101,6 +103,15 @@ class Ticket extends Model<Ticket> {
 
   @BelongsToMany(() => Tag, () => TicketTag)
   tags: Tag[];
+
+  @HasMany(() => Comment)
+  comments: Comment[];
+
+  @Column({ allowNull: true })
+  funnelStage: string;
+
+  @Column({ allowNull: true, type: DataType.DECIMAL(10, 2) })
+  dealValue: number;
 
   @ForeignKey(() => Company)
   @Column

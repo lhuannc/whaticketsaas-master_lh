@@ -1,0 +1,130 @@
+/* =====================================================================
+   Omnichannel Plus — Management screen styles (Telas 5–6)
+   ===================================================================== */
+
+/* Role switch (segmented, top of app) */
+.role-switch {
+  flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+  margin: 10px 14px 0; padding: 4px; background: var(--surface-2);
+  border: 1px solid var(--border); border-radius: 14px;
+}
+.role-switch button {
+  border: none; background: transparent; cursor: pointer; font-family: var(--font);
+  font-weight: 700; font-size: 13.5px; color: var(--text-2); padding: 9px 8px; border-radius: 10px;
+  min-height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; transition: all .18s; white-space: nowrap;
+}
+.role-switch button svg { width: 17px; height: 17px; }
+.role-switch button.on { background: var(--brand-grad); color: #fff; box-shadow: 0 4px 12px -4px rgba(42,104,143,.6); }
+
+.sa-badge { width: 34px; height: 34px; flex: none; border-radius: 10px; background: var(--brand-grad); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 13px; letter-spacing: .02em; }
+
+/* Section title */
+.sec-title { display: flex; align-items: baseline; gap: 8px; margin: 18px 2px 11px; }
+.sec-title > span:first-child { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; color: var(--text-2); white-space: nowrap; }
+.sec-sub { font-size: 11.5px; font-weight: 700; color: var(--text-3); white-space: nowrap; }
+
+/* Switch (generic) */
+.switch { width: 50px; height: 30px; border-radius: 999px; border: none; background: var(--border-2); cursor: pointer; position: relative; flex: none; transition: background .2s; padding: 0; }
+.switch.on { background: var(--ok); }
+.switch .knob { position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: transform .22s cubic-bezier(.3,1.4,.5,1); box-shadow: 0 2px 5px rgba(0,0,0,.25); }
+.switch.on .knob { transform: translateX(20px); }
+
+/* ---------- Canais ---------- */
+.chan { padding: 14px; margin-bottom: 11px; }
+.chan-top { display: flex; align-items: center; gap: 12px; }
+.chan-ic { width: 44px; height: 44px; flex: none; border-radius: 13px; display: grid; place-items: center; }
+.chan-name { font-weight: 800; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chan-meta { font-size: 12.5px; color: var(--text-3); font-weight: 600; margin-top: 2px; }
+.chan-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 13px; padding-top: 13px; border-top: 1px solid var(--border); }
+.chan-api { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--text-3); white-space: nowrap; }
+.chan-api svg { width: 14px; height: 14px; }
+.mini-btn { border: 1px solid var(--border-2); background: var(--surface-2); color: var(--text); font-family: var(--font); font-weight: 700; font-size: 12.5px; padding: 8px 14px; border-radius: 10px; cursor: pointer; min-height: 38px; }
+.mini-btn:active { transform: scale(.96); }
+
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; padding: 5px 11px; border-radius: 999px; flex: none; }
+.pill-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.pill.ok { color: var(--ok); background: rgba(22,163,74,.13); }
+.pill.off { color: var(--text-3); background: var(--surface-2); }
+.pill.warn { color: var(--warn); background: rgba(217,119,6,.14); }
+
+.add-row { width: 100%; min-height: 48px; border: 1.5px dashed var(--border-2); background: transparent; border-radius: 14px; color: var(--accent); font-family: var(--font); font-weight: 700; font-size: 13.5px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 2px; transition: background .15s; }
+.add-row svg { width: 18px; height: 18px; }
+.add-row:hover { background: var(--brand-grad-soft); }
+
+/* ---------- Equipe ---------- */
+.invite { padding: 16px; }
+.invite-lbl { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 14.5px; margin-bottom: 12px; }
+.invite-lbl svg { width: 18px; height: 18px; color: var(--accent); }
+.invite-row { display: flex; gap: 9px; }
+.invite-queues { display: flex; gap: 7px; margin-top: 12px; }
+.qchip { font-size: 12.5px; font-weight: 700; padding: 7px 13px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border-2); color: var(--text-2); cursor: pointer; min-height: 36px; display: inline-flex; align-items: center; }
+.qchip.on { background: var(--chip); color: var(--chip-text); border-color: transparent; }
+
+.member { padding: 12px 14px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+.presence { position: absolute; bottom: -2px; right: -2px; width: 13px; height: 13px; border-radius: 50%; border: 2.5px solid var(--surface); }
+.rolechip { font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 7px; background: var(--surface-2); color: var(--text-2); border: 1px solid var(--border); }
+.rolechip.admin { background: var(--brand-grad-soft); color: var(--accent-bright); border-color: rgba(66,185,235,.3); }
+.queuechip { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 7px; background: var(--chip); color: var(--chip-text); }
+
+/* ---------- IA ---------- */
+.ia-master { padding: 18px; display: flex; align-items: center; gap: 14px; transition: all .25s; }
+.ia-master.on { background: var(--brand-grad); border-color: transparent; box-shadow: var(--shadow-md); }
+.ia-master.on .switch { background: rgba(255,255,255,.3); }
+.ia-master.on .switch.on { background: rgba(255,255,255,.95); }
+.ia-master.on .switch.on .knob { background: var(--brand-deep); }
+.ia-master-ic { width: 48px; height: 48px; flex: none; border-radius: 14px; background: var(--brand-grad-soft); color: var(--accent-bright); display: grid; place-items: center; }
+.ia-master.on .ia-master-ic { background: rgba(255,255,255,.2); color: #fff; }
+.ia-master.on .ia-master-ic svg, .ia-master.on > div { color: #fff; }
+.ia-master-ic svg { width: 24px; height: 24px; }
+.ia-row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; }
+.tone-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.tone { min-height: 46px; border: 1.5px solid var(--border-2); background: var(--surface); color: var(--text-2); font-family: var(--font); font-weight: 700; font-size: 13.5px; border-radius: 13px; cursor: pointer; transition: all .15s; }
+.tone.on { background: var(--brand-grad); color: #fff; border-color: transparent; }
+
+/* ---------- Financeiro ---------- */
+.sub-card { padding: 20px; background: linear-gradient(135deg,#1d4d6e,#2a688f 45%,#3a9bd0); border: none; color: #fff; position: relative; overflow: hidden; box-shadow: var(--shadow-md); }
+.sub-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.sub-plan { font-size: 26px; font-weight: 800; letter-spacing: -.02em; margin-top: 3px; }
+.sub-plan span { font-size: 14px; font-weight: 700; opacity: .8; }
+.sub-price { text-align: right; }
+.sub-price b { font-size: 24px; font-weight: 800; }
+.sub-price span { font-size: 13px; opacity: .8; font-weight: 600; }
+.sub-invoice { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.18); }
+.sub-invoice .pill.warn { background: rgba(255,255,255,.18); color: #ffe0b2; }
+
+.bar { height: 9px; border-radius: 999px; background: var(--surface-2); overflow: hidden; border: 1px solid var(--border); }
+.bar-fill { display: block; height: 100%; border-radius: 999px; transition: width .6s cubic-bezier(.3,1,.3,1); }
+
+.pix-btn { width: 100%; margin-top: 16px; background: #32BCAD; color: #fff; box-shadow: 0 6px 18px -6px rgba(50,188,173,.6); }
+.pix-btn svg { width: 19px; height: 19px; }
+.qr { width: 180px; height: 180px; margin: 0 auto; background: #fff; border-radius: 16px; padding: 14px; box-shadow: var(--shadow-md); }
+.qr-grid { width: 100%; height: 100%; display: grid; grid-template-columns: repeat(12,1fr); grid-template-rows: repeat(12,1fr); }
+.qr-grid span { width: 100%; height: 100%; }
+
+/* ---------- Super Admin · Empresas ---------- */
+.metric-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 14px; }
+.metric { padding: 14px 12px; }
+.metric-l { font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: .04em; }
+.metric-v { font-size: 20px; font-weight: 800; letter-spacing: -.02em; margin-top: 5px; }
+.metric-t { font-size: 11.5px; font-weight: 800; color: var(--ok); margin-top: 3px; }
+
+.tenant { padding: 14px; margin-bottom: 11px; position: relative; }
+.tenant-top { display: flex; align-items: center; gap: 12px; }
+.tenant-ic { width: 44px; height: 44px; flex: none; border-radius: 13px; background: var(--brand-grad-soft); color: var(--accent); display: grid; place-items: center; }
+.tenant-ic svg { width: 22px; height: 22px; }
+.tenant-name { font-weight: 800; font-size: 15.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tenant-meta { font-size: 12.5px; color: var(--text-3); font-weight: 600; margin-top: 2px; }
+.tenant-meta b { color: var(--text-2); font-weight: 800; }
+.tenant-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 13px; padding-top: 12px; border-top: 1px solid var(--border); }
+.tenant-due { font-size: 12px; color: var(--text-3); font-weight: 600; white-space: nowrap; }
+.tenant-due b { color: var(--text-2); font-weight: 800; }
+.tenant-menu { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; display: flex; flex-direction: column; gap: 2px; }
+.tenant-menu button { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: transparent; border: none; cursor: pointer; font-family: var(--font); font-weight: 700; font-size: 14px; color: var(--text); padding: 11px 10px; border-radius: 10px; }
+.tenant-menu button svg { width: 18px; height: 18px; color: var(--text-3); }
+.tenant-menu button:hover { background: var(--surface-2); }
+.tenant-menu button.danger { color: var(--bad); }
+.tenant-menu button.danger svg { color: var(--bad); }
+
+/* ---------- Super Admin · Métricas ---------- */
+.chart { display: flex; align-items: flex-end; gap: 7px; height: 110px; }
+.chart-bar { flex: 1; background: var(--brand-grad); border-radius: 5px 5px 2px 2px; min-height: 4px; }
